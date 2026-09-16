@@ -6,7 +6,7 @@
 ## Context
 
 Eigen reserveringen vereisen een betrouwbare server-side identiteit. Een beheerder
-beheert in release 1 alleen ruimtes en geen reserveringen van anderen.
+mag in release 1 ook reserveringen van anderen beheren.
 
 ## Besluit
 
@@ -18,7 +18,7 @@ demo-auth actief staat. Handhaaf medewerker- en beheerdersrechten in de API.
 
 - Een userId uit de request-body.
 - Een client-header of keuzeveld met gebruikersnaam.
-- Beheerder toegang geven tot alle boekingen.
+- Beheerder uitsluitend toegang geven tot ruimtebeheer.
 
 ## Motivatie
 

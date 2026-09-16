@@ -50,7 +50,7 @@ shared UI shell, or test fixture are intentionally sequential.
 - [X] T007 Create the initial SQL Server EF migration in `src/SmartSpace.Api/Data/Migrations/`; Depends: T006; Done when the migration creates the documented relationships and constraints and can be applied to an isolated SQL Server database.
 - [X] T008 Add DTOs, ProblemDetails codes, and the checked-in OpenAPI contract in `src/SmartSpace.Api/Contracts/` and `specs/001-meeting-room-reservations/contracts/openapi.yaml`; Depends: T001, T003; Done when create/update requests are distinct, version is required only for updates/cancel/deactivation, and documented 400/401/403/404/409/503 meanings are stable.
 - [X] T009 [P] Write unit tests for invalid time ordering and exclusive boundary intervals in `tests/SmartSpace.UnitTests/BookingIntervalRulesTests.cs`; Depends: T005; Done when tests cover end-before-start, equal start/end, partial overlap, containment, identical intervals, and adjacent intervals, and fail against an intentionally missing rule implementation.
-- [X] T010 [P] Write unit tests for ownership and role decisions in `tests/SmartSpace.UnitTests/AuthorizationRulesTests.cs`; Depends: T005; Done when tests cover owner-derived identity, another employee denial, employee denial of administration, and administrator denial of other employees' reservations.
+- [X] T010 [P] Write unit tests for ownership and role decisions in `tests/SmartSpace.UnitTests/AuthorizationRulesTests.cs`; Depends: T005; Done when tests cover owner-derived identity, employee denial of another employee's reservation, employee denial of administration, and administrator access to another employee's reservation.
 - [ ] T011 [P] Write SQL Server integration tests for concurrent overlapping creates in `tests/SmartSpace.IntegrationTests/Concurrency/ConcurrentReservationTests.cs`; Depends: T006, T007; Done when at least 100 repeated request pairs use separate contexts/process-equivalents against the same SQL Server database and assert at most one success plus no overlapping active rows.
 - [ ] T012 [P] Write integration tests for failed update preservation in `tests/SmartSpace.IntegrationTests/Reservations/FailedUpdatePreservesOriginalTests.cs`; Depends: T006, T007; Done when an overlap, stale-version, and invalid-time rejection each prove the original reservation values/status remain unchanged.
 - [X] T013 [P] Write unit tests for Europe/Amsterdam DST requirements in `tests/SmartSpace.UnitTests/TimeZoneRulesTests.cs`; Depends: T005; Done when nonexistent local times are rejected and duplicate local times require an explicit choice, with no implicit server-timezone fallback.
@@ -106,15 +106,15 @@ and proposed repeated-cancel behavior.
 
 ## Phase 6: User Story 4 - Ruimtes beheren (P2)
 
-**Goal**: Administrators can maintain rooms without gaining reservation-management
-rights for other employees.
+**Goal**: Administrators can maintain rooms and manage other employees' reservations
+under the confirmed release-1 policy.
 
 **Independent test**: `TEST-US4-ROOM-ADMIN` covers valid create/update/deactivate,
 validation errors, blocked deactivation, unauthorized employee access, and history
 preservation.
 
 - [ ] T034 [US4] Implement room administration service in `src/SmartSpace.Api/Features/Administration/AdminRoomService.cs`; Depends: T005-T008, T014, T022; Done when positive capacity/location/name validation, admin role checks, version checks, deactivation guard, no implicit cancellation, and no hard delete are enforced (FR-014-FR-016; AC-US4.1-US4.6).
-- [ ] T035 [US4] Add administration Minimal API endpoints in `src/SmartSpace.Api/Features/Administration/AdminRoomEndpoints.cs`; Depends: T034, T015, T008; Done when create/update/deactivate DTOs match OpenAPI, create has no version requirement, updates have version requirements, and 403/409 ProblemDetails are stable.
+- [ ] T035 [US4] Add administration Minimal API endpoints in `src/SmartSpace.Api/Features/Administration/AdminRoomEndpoints.cs`; Depends: T034, T015, T008; Done when create/update/deactivate/reactivate DTOs match OpenAPI, create has no version requirement, updates have version requirements, and 403/409 ProblemDetails are stable.
 - [ ] T036 [US4] Add room administration integration tests in `tests/SmartSpace.IntegrationTests/Administration/AdminRoomTests.cs`; Depends: T035, T016; Done when validation, active/inactive visibility, blocked deactivation, version conflicts, employee denial, and reservation-preserving lifecycle are asserted.
 - [ ] T037 [P] [US4] Build the admin rooms page and accessible form/table components in `src/SmartSpace.UI/Pages/AdminRooms.razor` and `src/SmartSpace.UI/Components/Admin/`; Depends: T035; Done when admin-only navigation, inline validation, blocked-deactivation explanation, loading/error states, and keyboard/responsive behavior are specified.
 - [ ] T038 [US4] Add browser coverage for room administration in `tests/SmartSpace.IntegrationTests/Browser/admin-rooms.spec.ts`; Depends: T036, T037; Done when valid admin flow, invalid input, blocked deactivation, employee denial, and responsive keyboard flow map to AC-US4.1-US4.6.
@@ -124,7 +124,7 @@ preservation.
 - [ ] T039 [P] Add cross-cutting accessibility and responsive requirements evidence templates in `tests/SmartSpace.IntegrationTests/Browser/accessibility.spec.ts` and `docs/validation/accessibility.md`; Depends: T020, T026, T033, T038; Done when keyboard, labels, focus, text alternatives, 375/768/1440px, 200% zoom, and no-overflow criteria are listed without claiming they passed.
 - [ ] T040 [P] Add API contract consistency review notes in `docs/validation/openapi-review.md`; Depends: T008, T018, T023, T028, T035; Done when every documented route has an owning feature, DTO, status-code mapping, and requirement/AC/test reference.
 - [ ] T041 Update `README.md` with local start, SQL Server prerequisite, exact URLs, CORS origin, migrations, test groups, and known open decisions; Depends: T001-T004, T039-T040; Done when commands are documented without secrets and the training prototype is not described as production acceptance.
-- [ ] T042 Resolve or explicitly gate open product decisions in `specs/001-meeting-room-reservations/spec.md`, `specs/001-meeting-room-reservations/plan.md`, and `docs/decisions/`; Depends: T027-T038; Done when historical room data, running-reservation boundary, reactivation, retry/commit behavior, and retention/privacy are either confirmed by BIDN or clearly blocking/deferred.
+- [ ] T042 Resolve or explicitly gate open product decisions in `specs/001-meeting-room-reservations/spec.md`, `specs/001-meeting-room-reservations/plan.md`, and `docs/decisions/`; Depends: T027-T038; Done when all remaining open product decisions are either confirmed by BIDN or clearly blocking/deferred; retry/commit behavior, historical snapshots, retention/privacy, running-reservation boundary, and reactivation are already confirmed.
 - [ ] T043 Run the full traceability review in `docs/validation/traceability.md`; Depends: T040-T042; Done when every FR-001-FR-020 has at least one AC reference, implementation task, and named test artifact, with unresolved proposals listed separately.
 
 ## Traceability matrix

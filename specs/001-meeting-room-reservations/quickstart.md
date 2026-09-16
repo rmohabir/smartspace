@@ -55,7 +55,8 @@ code or secrets.
   reservation.
 - Cancel an own future booking; assert history remains and the interval is free.
 - Attempt read/change/cancel with another employee's identity; assert denial without
-  leaking owner data.
+  leaking owner data. Repeat with an administrator identity and assert the confirmed
+  administrator permission is applied.
 
 ### Room administration
 

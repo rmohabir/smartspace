@@ -19,13 +19,13 @@ niet dat implementatie of tests zijn uitgevoerd.
 - [x] CHK001 Is vastgelegd dat de eigenaar server-side wordt bepaald en niet door een vrije gebruikersinvoer? [Completeness, Spec FR-007]
   - Beoordeling: ja; FR-007 en de medewerker-/reserveringsscenario's maken dit expliciet.
 - [x] CHK002 Is de bevoegdheidsgrens tussen medewerker en beheerder consistent beschreven? [Consistency, Spec FR-016]
-  - Beoordeling: ja; de beheerder beheert alleen ruimtes en mag geen reserveringen van anderen beheren.
+  - Beoordeling: ja; medewerkers mogen alleen eigen reserveringen beheren, terwijl beheerders in release 1 reserveringen van anderen mogen beheren.
 - [x] CHK003 Is ongeautoriseerde inzage onderscheiden van ongeautoriseerde wijziging en annulering? [Coverage, Spec US3/US4]
   - Beoordeling: ja; de scenario's en FR-013/FR-016 noemen inzage, wijzigen en annuleren.
 - [x] CHK004 Is het voorkomen van persoonsgegevenslekken onderdeel van het autorisatievereiste? [Security, Spec FR-013]
   - Beoordeling: ja; reserverings-ID's en beschikbaarheid mogen geen eigenaargegevens onthullen.
-- [ ] CHK005 Is het beleid voor beheer bij afwezigheid van de eigenaar of tijdens een lopende reservering definitief en ondubbelzinnig? [Gap, Spec Open Product Decisions]
-  - Bevinding: nee; dit blijft een open productbesluit en mag niet door implementatie worden ingevuld.
+- [x] CHK005 Is het beleid voor beheer bij afwezigheid van de eigenaar of tijdens een lopende reservering definitief en ondubbelzinnig? [Completeness, Spec Clarifications]
+  - Beoordeling: ja; een beheerder mag dit in release 1 altijd beheren.
 
 ## Overlap en gelijktijdige aanvragen
 
@@ -37,8 +37,8 @@ niet dat implementatie of tests zijn uitgevoerd.
   - Beoordeling: ja; de scenario's en edge cases noemen deze grensgevallen.
 - [x] CHK009 Is gelijktijdige aanvraag als afzonderlijk risico beschreven, inclusief de invariant dat hoogstens één aanvraag slaagt? [Coverage, Spec SC-002]
   - Beoordeling: ja; zowel spec als plan noemen concurrente paren en geen overlappende actieve rijen.
-- [ ] CHK010 Is het gewenste gedrag bij tijdelijke databasebezetting, onzekere commituitkomst en retry-grenzen als requirement vastgelegd? [Gap, Plan Test Strategy]
-  - Bevinding: gedeeltelijk; SQL Server-concurrency is benoemd, maar lock-timeout, retry en onbekende commituitkomst zijn niet als release-1 requirement vastgelegd.
+- [x] CHK010 Is het gewenste gedrag bij tijdelijke databasebezetting, onzekere commituitkomst en retry-grenzen als requirement vastgelegd? [Clarity, Spec Clarifications]
+  - Beoordeling: ja; maximaal drie retries met begrensde backoff zijn toegestaan, maar geen blinde retry bij onbekende commituitkomst.
 
 ## Tijdzones en lokale tijden
 
@@ -61,10 +61,10 @@ niet dat implementatie of tests zijn uitgevoerd.
   - Bevinding: nee; dit is nu expliciet als labvoorstel opgenomen, maar nog geen bevestigd productbesluit.
 - [x] CHK018 Is de grens vastgelegd dat reserveringen niet hard worden verwijderd? [Clarity, Spec FR-019]
   - Beoordeling: ja; ook de plan- en datamodelartefacts herhalen dit.
-- [ ] CHK019 Is duidelijk welke ruimtegegevens historische reserveringen tonen na een latere ruimtewijziging? [Gap, Spec Open Product Decisions]
-  - Bevinding: nee; snapshot bij boeking versus actuele gegevens blijft open.
-- [ ] CHK020 Is bewaartermijn en privacybeleid voor historische reserveringen vastgesteld? [Gap, Spec Open Product Decisions]
-  - Bevinding: nee; raadpleegbaarheid is genoemd, maar duur en precieze privacyregels ontbreken.
+- [x] CHK019 Is duidelijk welke ruimtegegevens historische reserveringen tonen na een latere ruimtewijziging? [Clarity, Spec Clarifications]
+  - Beoordeling: ja; historie toont naam, locatie en capaciteit van het boekmoment.
+- [x] CHK020 Is bewaartermijn en privacybeleid voor historische reserveringen vastgesteld? [Clarity, Spec Clarifications]
+  - Beoordeling: ja; de eigenaar heeft onbeperkte historie en beheerders krijgen alleen minimaal noodzakelijke gegevens.
 - [x] CHK021 Is de betekenis van "afgelopen" onderscheiden van de status "Cancelled"? [Clarity, Spec Key Entities/FR-012]
   - Beoordeling: ja; afgelopen is een weergavecategorie, geannuleerd een reserveringsstatus.
 
@@ -78,10 +78,10 @@ niet dat implementatie of tests zijn uitgevoerd.
   - Beoordeling: ja.
 - [x] CHK025 Is stilzwijgende annulering bij deactiveren uitgesloten? [Edge Case, Spec US4]
   - Beoordeling: ja; deactivering wordt geweigerd bij lopende of toekomstige actieve reserveringen.
-- [ ] CHK026 Is de grens van "lopende" reservering ten opzichte van het actuele tijdstip gedefinieerd? [Ambiguity, Spec Open Product Decisions]
-  - Bevinding: nee; dit is toegevoegd als expliciet open besluit, inclusief klokgrens/marge.
-- [ ] CHK027 Is heractiveren van een gedeactiveerde ruimte binnen scope of buiten scope verklaard? [Gap, Plan/TechStack]
-  - Bevinding: niet eenduidig; TechStack noemt heractiveren als voorstel, maar de spec beschrijft alleen deactiveren.
+- [x] CHK026 Is de grens van "lopende" reservering ten opzichte van het actuele tijdstip gedefinieerd? [Clarity, Spec Clarifications]
+  - Beoordeling: ja; lopend is `start <= nu < end` en de eindtijd is exclusief.
+- [x] CHK027 Is heractiveren van een gedeactiveerde ruimte binnen scope of buiten scope verklaard? [Clarity, Spec FR-015a]
+  - Beoordeling: ja; beheerders mogen heractiveren wanneer de locatie actief is.
 
 ## Foutgedrag en grensgevallen
 

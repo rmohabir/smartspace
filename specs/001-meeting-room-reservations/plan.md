@@ -158,10 +158,11 @@ en EF-entiteiten lekken niet naar de HTTP-contracten.
 
 ## Post-Design Constitution Re-check
 
-**Status**: PASS voor constitutionele stackconsistentie. Historische room-snapshots,
-idempotente herhaalde annulering en de exacte grens van een "lopende" reservering
-blijven expliciete productbesluiten of gelabelde voorstellen. Geen implementatie of
-productgoedkeuring volgt uit deze planfase.
+**Status**: PASS voor constitutionele stackconsistentie. Heractivering, historische
+room-snapshots, retention/privacy, de lopende-reserveringsgrens en retrygedrag zijn
+nu expliciet vastgelegd; overige open productbesluiten blijven als blokkade of
+gelabeld voorstel herkenbaar. Geen implementatie of productgoedkeuring volgt uit
+deze planfase.
 
 ## Complexity Tracking
 

@@ -50,6 +50,9 @@ Representeert een reservering voor één ruimte en één eigenaar.
 - `updatedAt`: laatste wijziging.
 - `cancelledAt`: optioneel tijdstip van annulering.
 - `version`: waarde voor stale-edit detectie.
+- `resourceNameAtBooking`: naam van de ruimte bij het boeken.
+- `locationNameAtBooking`: locatie van de ruimte bij het boeken.
+- `capacityAtBooking`: capaciteit van de ruimte bij het boeken.
 
 Een reservering is geldig wanneer `end > start`. Actieve reserveringen overlappen
 wanneer `existing.start < requested.end` én `existing.end > requested.start`.
@@ -80,7 +83,8 @@ Reservation * ─── 1 Employee (identity subject, external to release-1 doma
 ```text
 Reservation: Active -> Cancelled
 Reservation: Active -> Active (approved future update, new version)
-Resource: Active -> Inactive (only without ongoing/future active reservations)
+Resource: Active -> Inactive (only without active reservations where `start <= now < end`)
+Resource: Inactive -> Active (administrator, only when Location is active)
 ```
 
 Een geannuleerde reservering wordt niet opnieuw actief gemaakt in release 1. Een
@@ -91,10 +95,13 @@ afgewezen wijziging laat de oorspronkelijke waarden en status intact.
 - Alleen een ingelogde medewerker kan namens zichzelf reserveren.
 - Alleen de eigenaar kan een eigen toekomstige actieve reservering wijzigen of
   annuleren.
-- Een beheerder beheert alleen ruimtes; geen reserveringen van anderen.
+- Een beheerder mag in release 1 reserveringen van anderen beheren volgens de
+  bevestigde autorisatie- en privacyregels.
 - Alleen actieve ruimtes op actieve locaties verschijnen in nieuwe boekingsresultaten.
+- Een reservering blokkeert deactivering als `start <= now < end`; op het exclusieve
+  eindtijdstip is zij niet meer lopend.
 - Actieve overlappende reserveringen voor dezelfde ruimte zijn verboden.
 - Een conflict bij gelijktijdige mutaties mag geen twee overlappende actieve rijen
   opleveren.
-- Historie blijft voor de eigenaar raadpleegbaar volgens het nog te bevestigen
-  bewaarbeleid.
+- Historie blijft onbeperkt voor de eigenaar raadpleegbaar. Beheerders krijgen
+  alleen de minimaal noodzakelijke historische gegevens voor hun beheerhandeling.

@@ -12,9 +12,16 @@
 
 ### Session 2026-09-16
 
-- Q: Mag een beheerder reserveringen van andere medewerkers inzien, wijzigen of annuleren? → A: Optie A: nee; een beheerder beheert alleen ruimtes en reserveringen blijven onder beheer van de eigenaar.
-- Q: Moet het eindtijdstip exclusief zijn, zodat een reservering van 10:00–11:00 direct gevolgd mag worden door een reservering van 11:00–12:00? → A: Optie A: ja; aansluitende tijdvakken zijn toegestaan en een eventuele buffer is een afzonderlijk open beleidsbesluit.
+- Q: Mag een beheerder reserveringen van andere medewerkers inzien, wijzigen of annuleren? → A: Optie B; een beheerder mag reserveringen van anderen in release 1 beheren.
+- Q: Moet het eindtijdstip exclusief zijn, zodat een reservering van 10:00–11:00 direct gevolgd mag worden door een reservering van 11:00–12:00? → A: Optie A: ja; aansluitende tijdvakken zijn toegestaan en release 1 legt geen buffer op.
 - Q: Hoe moet SmartSpace omgaan met lokale tijden in Europe/Amsterdam die tijdens zomer- of wintertijd niet bestaan of dubbel voorkomen? → A: Optie A: niet-bestaande lokale tijden worden geweigerd en bij dubbel voorkomende tijden kiest de medewerker expliciet.
+- Q: Moeten release-1 reserveringen naast de toekomstgrens ook een maximale duur, boekingshorizon, openingstijden of buffer afdwingen? → A: Optie A: nee; release 1 kent geen extra beperkingen en gebruikt alleen geldige toekomstige tijdvakken en de exclusieve eindgrens.
+- Q: Mag een beheerder een reservering van een andere medewerker wijzigen of annuleren wanneer de eigenaar afwezig is of wanneer de reservering al loopt? → A: Optie B: ja; een beheerder mag reserveringen van anderen in release 1 altijd wijzigen of annuleren.
+- Q: Moet historische reserveringsinformatie de naam, locatie en capaciteit tonen zoals die bij het boeken golden, of de actuele ruimtegegevens? → A: Optie A: historie toont de ruimtegegevens zoals die bij het boeken golden.
+- Q: Welke bewaartermijn en privacyregel gelden voor historische reserveringen? → A: Optie A: de eigenaar houdt onbeperkte historie; beheerders zien alleen minimaal noodzakelijke gegevens voor beheer.
+- Q: Wanneer geldt een reservering als "lopend" voor ruimte-deactivering en beheerdersacties? → A: Optie A: lopend bij `start <= nu < end`; vanaf het exclusieve eindtijdstip is de reservering afgelopen.
+- Q: Mag een beheerder een gedeactiveerde ruimte later opnieuw activeren? → A: Optie A: ja; een beheerder mag activeren zolang de locatie actief is.
+- Q: Moeten databaseconflicten en tijdelijke SQL Server-bezetting automatisch worden herhaald, en zo ja, hoeveel keer? → A: maximaal drie retries met begrensde backoff bij tijdelijke bezetting; geen blinde retry bij een onbekende commituitkomst.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -71,8 +78,7 @@ de reservering bevestigen en daarna de reservering terugvinden in het eigen over
    geen nieuwe actieve reservering aangemaakt.
 4. **Given** een aanvraag voor een tijdvak sluit direct aan op een bestaande actieve
    reservering, **When** de medewerker boekt, **Then** wordt de aanvraag toegestaan
-  omdat het eindtijdstip exclusief is; een eventuele buffer is geen onderdeel van
-  deze bevestigde grensregel.
+  omdat het eindtijdstip exclusief is en release 1 geen buffer oplegt.
 
 ### User Story 3 - Eigen reserveringen en historie beheren (Priority: P1)
 
@@ -135,9 +141,9 @@ kan vinden.
    gebruiken, **When** de medewerker een beheeractie uitvoert, **Then** wordt de
    actie geweigerd en worden geen gegevens gewijzigd.
 6. **Given** een beheerder probeert een reservering van een andere medewerker te
-  beheren, **When** de beheerder de reservering opent of een mutatie uitvoert,
-  **Then** wordt de actie geweigerd en blijven de reservering en persoonsgegevens
-  van de eigenaar beschermd.
+  beheren, **When** de beheerder de reservering opent, wijzigt of annuleert,
+  **Then** wordt de actie toegestaan volgens dezelfde tijd-, overlap- en
+  versiecontroles als voor een eigenaar.
 
 ### Edge Cases
 
@@ -174,8 +180,7 @@ kan vinden.
 - **FR-005**: Het systeem MUST actieve overlappende reserveringen voor dezelfde ruimte
   voorkomen, ook wanneer aanvragen gelijktijdig binnenkomen.
 - **FR-006**: Het systeem MUST aansluitende tijdvakken toestaan op basis van een
-  exclusief eindtijdstip. Een eventuele buffer is een afzonderlijk open
-  productbesluit en mag niet stilzwijgend worden toegevoegd.
+  exclusief eindtijdstip. Release 1 legt geen buffer op.
 - **FR-007**: Het systeem MUST een reservering aan de ingelogde medewerker koppelen
   en mag de eigenaar niet uit vrije invoer van de medewerker overnemen.
 - **FR-008**: Het systeem MUST medewerkers hun eigen toekomstige actieve reserveringen
@@ -190,15 +195,19 @@ kan vinden.
   reserveringen afzonderlijk raadpleegbaar maken.
 - **FR-013**: Het systeem MUST voorkomen dat medewerkers persoonsgegevens of
   reserveringsdetails van andere medewerkers via beschikbaarheid of reserverings-ID
-  inzien.
+  inzien. Een bevoegde beheerder mag reserveringen van anderen wel beheren volgens
+  de vastgelegde beheerrechten.
 - **FR-014**: Het systeem MUST beheerders ruimtes laten toevoegen, naam, positieve
   capaciteit en locatie laten aanpassen en ruimtes laten deactiveren wanneer geen
   lopende of toekomstige actieve reservering bestaat.
 - **FR-015**: Het systeem MUST inactieve ruimtes uitsluiten van nieuwe
   beschikbaarheids- en boekingsresultaten, terwijl relevante historie behouden blijft.
+- **FR-015a**: Het systeem MUST beheerders toestaan een gedeactiveerde ruimte opnieuw
+  te activeren wanneer de gekoppelde locatie actief is.
 - **FR-016**: Het systeem MUST beheeracties van onbevoegde medewerkers weigeren en
-  geen wijziging uitvoeren. De beheerdersrol geeft in release 1 geen recht om
-  reserveringen van andere medewerkers in te zien, te wijzigen of te annuleren.
+  geen wijziging uitvoeren. De beheerdersrol geeft in release 1 recht om
+  reserveringen van andere medewerkers in te zien, te wijzigen en te annuleren,
+  ook wanneer de eigenaar afwezig is of de reservering al loopt.
 - **FR-017**: Het systeem MUST tijden begrijpelijk tonen in Europe/Amsterdam,
   niet-bestaande lokale tijden weigeren en de medewerker bij dubbel voorkomende
   lokale tijden expliciet laten kiezen.
@@ -215,24 +224,30 @@ De volgende punten zijn herkenbaar als voorstel of besluitpunt en zijn niet
 stilzwijgend goedgekeurd:
 
 - **Labvoorstel**: nieuwe en gewijzigde reserveringen starten in de toekomst.
-- **Labvoorstel**: aansluitende tijdvakken zijn toegestaan zonder buffer.
-- **Open productbesluit**: zijn buffers, openingstijden, maximale duur of een
-  boekingshorizon nodig?
-- **Bevestigd besluit**: een beheerder beheert in release 1 alleen ruimtes en mag
-  geen reserveringen van andere medewerkers inzien, wijzigen of annuleren.
+- **Bevestigd besluit**: aansluitende tijdvakken zijn toegestaan zonder buffer.
+- **Bevestigd besluit**: release 1 legt geen maximale duur, boekingshorizon,
+  openingstijden of buffer op. Alleen geldige toekomstige tijdvakken en de
+  exclusieve eindgrens gelden.
+- **Bevestigd besluit**: een beheerder mag in release 1 reserveringen van andere
+  medewerkers inzien, wijzigen en annuleren, ook bij afwezigheid van de eigenaar
+  of wanneer de reservering al loopt.
 - **Bevestigd besluit**: Europe/Amsterdam is de invoer- en weergavetijdzone; een
   niet-bestaande lokale tijd wordt geweigerd en een dubbel voorkomende lokale tijd
   vereist een expliciete keuze.
-- **Open productbesluit**: hoe worden reserveringen beheerd bij afwezigheid van de
-  eigenaar of bij een lopende reservering?
-- **Open productbesluit**: welke bewaartermijn en privacyregels gelden voor historie?
-- **Open productbesluit**: toont historie de ruimtegegevens zoals die bij het boeken
-  golden, of altijd de actuele ruimtegegevens?
+- **Bevestigd besluit**: de eigenaar kan historische reserveringen onbeperkt
+  raadplegen. Beheerders krijgen alleen de minimaal noodzakelijke gegevens voor
+  hun beheerhandeling.
+- **Bevestigd besluit**: historie toont de naam, locatie en capaciteit zoals die bij
+  het boeken golden.
 - **Labvoorstel**: een herhaalde annulering van een al geannuleerde eigen
   reservering is zonder neveneffect succesvol; de eerste annulering blijft aan
   eigenaarschap en geldige versie onderworpen.
-- **Open productbesluit**: wat betekent "lopende" reservering precies op de grens
-  van het actuele tijdstip, inclusief eventuele klokmarge?
+- **Bevestigd besluit**: een reservering is lopend bij `start <= nu < end`; vanaf
+  het exclusieve eindtijdstip is zij afgelopen en blokkeert zij deactivering niet
+  meer.
+- **Bevestigd besluit**: tijdelijke SQL Server-bezetting mag maximaal drie keer
+  opnieuw worden geprobeerd met begrensde backoff. Bij een onbekende commituitkomst
+  wordt niet blind opnieuw geprobeerd.
 - **Bronstatus**: `StakeholderDocuments/OpenQuestions.md` was niet aanwezig; de
   resterende open punten uit `TechStack.md` §15 moeten door BIDN worden bevestigd.
 
@@ -288,7 +303,7 @@ stilzwijgend goedgekeurd:
 - Een actieve reservering blokkeert een overlappend tijdvak; een geannuleerde
   reservering doet dat niet.
 - Release 1 gebruikt een exclusief eindtijdstip; intervallen die exact op elkaar
-  aansluiten zijn toegestaan. Een eventuele buffer blijft een open productbesluit.
+  aansluiten zijn toegestaan. Release 1 legt geen buffer op.
 - Zonder bevestigd boekingsbeleid wordt een reservering met een start in het verleden
   of heden afgewezen. Dit blijft een labvoorstel.
 - De lokale interface gebruikt Europe/Amsterdam voor invoer en weergave; ongeldige
