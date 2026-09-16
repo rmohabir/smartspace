@@ -22,7 +22,7 @@ richtlijnen voor de toekomstige monorepo en voeren in deze planfase niets uit.
 
 1. Apply EF Core migrations to the isolated SQL Server database.
 2. Start the API on `http://localhost:5080`.
-3. Start the Next.js webapp on `http://localhost:3000`.
+3. Start the Blazor WebAssembly UI on `http://localhost:3000`.
 4. Confirm that browser requests go directly from the webapp origin to the API.
 5. Open the generated OpenAPI document and compare it with
    [contracts/openapi.yaml](contracts/openapi.yaml).

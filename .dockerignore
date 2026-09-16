@@ -1,0 +1,13 @@
+.git/
+.github/
+.specify/
+docs/
+StakeholderDocuments/
+specs/
+**/bin/
+**/obj/
+.env
+.env.*
+!.env.example
+*.user
+*.suo

@@ -8,21 +8,20 @@
 
 SmartSpace release 1 ondersteunt het zoeken, boeken, wijzigen, annuleren en
 raadplegen van eigen reserveringen voor vergaderruimtes, plus ruimtebeheer door
-beheerders. De planinput vraagt een monorepo met een .NET 10 C# controller Web API,
-EF Core 10 met SQL Server migrations, en een React/Next.js App Router frontend.
+beheerders. De monorepo gebruikt .NET 10 C#, ASP.NET Core Minimal API, EF Core 10
+met SQL Server migrations en standalone Blazor WebAssembly.
 
-De reserveringsregels worden server-side en transactioneel afgedwongen. De browser
-praat rechtstreeks met de API via een exacte Development-CORS-origin. Interactieve,
-gebruikersafhankelijke boekingsdata wordt in client components met `no-store`
-opgehaald. Geen applicatiecode wordt in deze planningsfase gemaakt.
+De reserveringsregels worden server-side en transactioneel afgedwongen. De Blazor-
+frontend praat rechtstreeks met de API via een exacte Development-CORS-origin en
+gebruikt een getypeerde HttpClient voor gebruikersafhankelijke boekingsdata. Geen
+applicatiecode wordt in deze planningsfase gemaakt.
 
 ## Technical Context
 
-**Language/Version**: C#/.NET 10; TypeScript volgens de gekozen Next.js-toolchain
+**Language/Version**: C#/.NET 10
 
-**Primary Dependencies**: ASP.NET Core controller Web API, Entity Framework Core 10,
-SQL Server provider, React, Next.js App Router, accessible responsive UI components,
-OpenAPI/ProblemDetails
+**Primary Dependencies**: ASP.NET Core Minimal API, Entity Framework Core 10, SQL
+Server provider, standalone Blazor WebAssembly, Tailwind CSS, OpenAPI/ProblemDetails
 
 **Storage**: SQL Server als persistente bron van waarheid; EF Core migrations
 
@@ -62,15 +61,15 @@ deelnemerslijsten, check-in/check-out of externe integraties
 | Backend-autorisatie en eigenaarschap | PASS | Claims, policies en eigenaarchecks zitten in de API en worden getest. |
 | Development-identiteit buiten Development uit | PASS | De development identity wordt environment-gated en negatief getest. |
 | Historie en geen hard delete | PASS | Annuleren is een statuswijziging; rooms en reservations worden niet verwijderd. |
-| Vastgelegde stack en eenvoudigste architectuur | CONDITIONAL | De planinput wijkt af van de constitutionele Blazor/Minimal API-keuze naar Next.js/React en controller Web API. Dit blijft Voorgesteld totdat de constitution wordt gewijzigd of de stackkeuze wordt teruggedraaid. |
+| Vastgelegde stack en eenvoudigste architectuur | PASS | De planstack volgt .NET 10, Blazor WebAssembly, Minimal API, EF Core, Tailwind CSS en SQL Server. |
 | Foutscenario's en geautomatiseerde tests | PASS | Unit-, SQL Server-integratie- en browserflows bevatten positieve en negatieve paden. |
 | Secrets en persoonsgegevens | PASS | Configuratie gebruikt environment settings; ProblemDetails/logging minimaliseren data. |
 | Toegankelijke UI | PASS | Keyboard, labels, focus, responsive states en begrijpelijke foutmeldingen zijn gates. |
 | Voorstelstatus expliciet | PASS | Alle nieuwe architectuurkeuzes staan in `docs/decisions` met status Voorgesteld. |
 
-**Gate-uitkomst vóór research**: CONDITIONAL, niet volledig PASS. Er wordt geen
-implementatie gestart. Goedkeuring van de stackafwijking of een constitutionele
-amendment is een pre-implementation besluit.
+**Gate-uitkomst vóór research**: PASS voor stackconsistentie. Open productbesluiten
+blijven afzonderlijke pre-implementation gates; deze planning keurt geen product- of
+architectuurbesluit buiten de constitution goed.
 
 ## Project Structure
 
@@ -103,12 +102,12 @@ src/
 │   ├── Domain/
 │   ├── Security/
 │   └── Program.cs
-└── smartspace-web/
-    ├── app/
-    ├── components/
-    ├── lib/
-    ├── public/
-    └── styles/
+└── SmartSpace.UI/
+  ├── Pages/
+  ├── Components/
+  ├── Layout/
+  ├── Services/
+  └── Styles/
 
 tests/
 ├── SmartSpace.UnitTests/
@@ -132,8 +131,8 @@ en EF-entiteiten lekken niet naar de HTTP-contracten.
 
 - `research.md` legt gekozen, voorgestelde en afgewezen alternatieven vast.
 - Open punten uit de spec worden niet als BIDN-beleid ingevuld.
-- De controller Web API-, SQL Server-migrations- en React/Next.js-keuzes worden
-  getoetst aan de constitutionele stackregel.
+- De Minimal API-, SQL Server-migrations- en Blazor-keuzes worden getoetst aan de
+  constitutionele stackregel.
 
 ## Phase 1: Design Outputs
 
@@ -159,16 +158,13 @@ en EF-entiteiten lekken niet naar de HTTP-contracten.
 
 ## Post-Design Constitution Re-check
 
-**Status**: CONDITIONAL blijft staan totdat de voorgestelde frontend/API-stack als
-constitutionele wijziging is goedgekeurd. De overige gates zijn ontwerpbaar conform
-de constitution. Historische room-snapshots, idempotente herhaalde annulering en de
-exacte grens van een "lopende" reservering blijven expliciete productbesluiten of
-gelabelde voorstellen. Geen implementatie of productgoedkeuring volgt uit deze
-planfase.
+**Status**: PASS voor constitutionele stackconsistentie. Historische room-snapshots,
+idempotente herhaalde annulering en de exacte grens van een "lopende" reservering
+blijven expliciete productbesluiten of gelabelde voorstellen. Geen implementatie of
+productgoedkeuring volgt uit deze planfase.
 
 ## Complexity Tracking
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |---|---|---|
-| Frontend/API-stack wijkt af van constitution | De planinput vraagt React/Next.js en controller Web API. | De constitutionele Blazor/Minimal API-stack is niet stilzwijgend vervangen; de afwijking blijft voorgesteld en vereist expliciete amendment. |
 | Twee aparte integration-testprojecten | SQL Server-concurrency en browserflows hebben verschillende runtime-eisen. | Eén testproject zou verantwoordelijkheden en testfixtures onnodig vermengen. |

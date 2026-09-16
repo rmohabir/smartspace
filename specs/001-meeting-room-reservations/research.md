@@ -26,30 +26,28 @@ schijf en Azure SQL blijven niet gekozen alternatieven totdat BIDN dat besluit.
 
 ## API-boundary
 
-**Decision**: Planinput kiest ASP.NET Core controller Web API met DTO's,
+**Decision**: SmartSpace gebruikt ASP.NET Core Minimal API met DTO's,
 ProblemDetails en OpenAPI.
 
-**Rationale**: Controllers geven een expliciete HTTP-boundary en ondersteunen het
+**Rationale**: Minimal API past bij de constitutionele stack en ondersteunt het
 gevraagde contractdocument.
 
-**Alternatives considered**: De StakeholderDocuments/TechStack.md beschrijft
-Minimal API. Dat is niet stilzwijgend behouden of vervangen; de controllerkeuze
-blijft **Voorgesteld** en vereist constitutionele afstemming.
+**Alternatives considered**: Een controllergebaseerde API is niet gekozen omdat die
+niet in de vastgelegde constitutionele stack staat.
 
 ## Frontend-boundary
 
-**Decision**: Planinput kiest React met Next.js App Router en TypeScript. Interactieve
-boekingsdata gebruikt client components en `no-store`; browserrequests gaan
-rechtstreeks naar `http://localhost:5080` vanuit de exacte origin
-`http://localhost:3000`.
+**Decision**: SmartSpace gebruikt standalone Blazor WebAssembly met Tailwind CSS.
+De UI gebruikt typed HttpClient-calls rechtstreeks naar `http://localhost:5080`
+vanuit de exacte Development-origin `http://localhost:3000`.
 
-**Rationale**: Dit volgt de expliciete actuele planinput en houdt gebruikers-
 afhankelijke gegevens uit statische/cached serverweergaven.
+**Rationale**: Dit volgt de constitutionele stack en de stakeholder-TechStack.
 
-**Alternatives considered**: De stakeholder-TechStack beschrijft standalone Blazor
-WebAssembly met Tailwind. Dit blijft een constitutionele afwijking in voorgestelde
-status. Een server-side proxy is niet gekozen omdat de browser rechtstreeks de API
-moet benaderen.
+**Alternatives considered**: Een moderne JavaScript-frontend is niet gekozen omdat
+de constitutionele stack Blazor WebAssembly voorschrijft.
+Een server-side proxy is niet gekozen omdat de browser rechtstreeks de API moet
+benaderen.
 
 ## Booking integrity
 

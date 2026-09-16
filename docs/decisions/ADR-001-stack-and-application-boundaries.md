@@ -5,27 +5,26 @@
 
 ## Context
 
-De stakeholder-TechStack beschrijft Blazor WebAssembly en Minimal API. De actuele
-planinput vraagt React, Next.js App Router, TypeScript en controller Web API. De
-constitution benoemt de stakeholderstack als vastgelegd.
+De stakeholder-TechStack en constitution beschrijven Blazor WebAssembly en ASP.NET
+Core Minimal API als de vastgelegde stack.
 
 ## Besluit
 
-Gebruik voor deze planvariant .NET 10 controller Web API en React/Next.js App Router
-in één monorepo. Dit besluit is **Voorgesteld** en wordt niet als goedgekeurd
-beschouwd zonder constitutionele afstemming.
+Gebruik .NET 10, ASP.NET Core Minimal API en standalone Blazor WebAssembly in één
+monorepo. Dit besluit volgt de constitutionele stack.
 
 ## Alternatieven
 
-- De constitutionele Blazor/Minimal API-stack volgen.
-- De huidige planvariant eerst formeel als constitutionele amendment vastleggen.
+- Een controllergebaseerde API met een alternatieve frontend gebruiken.
+- Een aparte frontend/API-stack als constitutionele amendment vastleggen.
 
 ## Motivatie
 
-De planvariant volgt de meest recente expliciete technische opdracht, terwijl de
-status zichtbaar blijft vanwege de bestaande governance.
+De gekozen stack volgt de bestaande constitution en stakeholderinput. Een eerdere
+afwijkende frontend/API-keuze is verwijderd.
 
 ## Consequenties
 
-Er zijn twee mogelijke richtingen voor implementatie. `/speckit-implement` mag niet
-starten zolang de afwijking niet is bevestigd of teruggedraaid.
+Er is één constitutioneel consistente implementatierichting. `/speckit-implement`
+mag de stack volgen zodra de overige open productbesluiten zijn gesloten of als
+expliciete blokkades zijn vastgelegd.

@@ -102,8 +102,8 @@ niet dat implementatie of tests zijn uitgevoerd.
 
 - [x] CHK034 Komt SQL Server als persistente bron overeen tussen constitution, plan en ADR-002? [Consistency, Plan Constitution Check]
   - Beoordeling: ja; SQLite is alleen als eerder prototype-alternatief beschreven.
-- [ ] CHK035 Is de React/Next.js/controller-Web-API-stack consistent met de huidige constitutionele stackkeuze? [Conflict, Plan Constitution Check]
-  - Bevinding: nee; het plan markeert dit terecht CONDITIONAL en ADR-001 als Voorgesteld.
+- [x] CHK035 Is de Blazor WebAssembly/Minimal API-stack consistent met de huidige constitutionele stackkeuze? [Consistency, Plan Constitution Check]
+  - Beoordeling: ja; plan, research, ADR-001 en tasks volgen nu de constitutionele stack.
 - [x] CHK036 Is het onderscheid tussen requirementsreview en uitvoering/implementatie expliciet? [Scope, Plan/Quickstart]
   - Beoordeling: ja; de artefacts claimen geen code- of producttest.
 - [x] CHK037 Is het OpenAPI-contract inhoudelijk consistent met create versus update van ruimtes? [Consistency, OpenAPI]
