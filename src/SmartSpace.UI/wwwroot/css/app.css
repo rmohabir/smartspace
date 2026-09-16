@@ -1,5 +1,7 @@
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #f4f7f8;
+    color: #17212b;
+    font-family: Georgia, 'Times New Roman', serif;
 }
 
 h1:focus {
@@ -21,7 +23,104 @@ a, .btn-link {
 }
 
 .content {
-    padding-top: 1.1rem;
+    padding: 2rem clamp(1rem, 4vw, 4rem);
+    max-width: 1200px;
+}
+
+.smartspace-hero {
+    background: linear-gradient(135deg, #123b45, #1c6670);
+    border-radius: 1.25rem;
+    color: white;
+    padding: clamp(2rem, 6vw, 5rem);
+    margin-bottom: 2rem;
+}
+
+.smartspace-hero h1,
+.page-heading h1 {
+    font-size: clamp(2.25rem, 5vw, 4.5rem);
+    line-height: 1;
+    max-width: 12ch;
+}
+
+.lead,
+.page-heading p {
+    font-size: 1.15rem;
+    max-width: 58ch;
+}
+
+.eyebrow {
+    color: #e2a93b;
+    font-family: Arial, sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    margin-bottom: .65rem;
+    text-transform: uppercase;
+}
+
+.workflow-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.workflow-card,
+.empty-state,
+.status-panel {
+    background: white;
+    border: 1px solid #dce5e7;
+    border-radius: 1rem;
+    padding: 1.5rem;
+}
+
+.workflow-card-primary {
+    border-top: .35rem solid #e2a93b;
+}
+
+.workflow-card h2,
+.empty-state h2,
+.status-panel h2 {
+    margin-top: 0;
+}
+
+.workflow-card .btn {
+    margin-top: 1rem;
+}
+
+.status-panel {
+    align-items: center;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
+
+.status-badge {
+    background: #e8f3ef;
+    border-radius: 999px;
+    color: #176044;
+    display: inline-block;
+    font-family: Arial, sans-serif;
+    font-size: .8rem;
+    font-weight: 700;
+    padding: .45rem .75rem;
+    white-space: nowrap;
+}
+
+.page-heading {
+    margin-bottom: 2rem;
+}
+
+.empty-state {
+    border-left: .35rem solid #e2a93b;
+    max-width: 720px;
+}
+
+@media (max-width: 640px) {
+    .status-panel {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
 
 .valid.modified:not([type=checkbox]) {

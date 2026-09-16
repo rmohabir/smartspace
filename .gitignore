@@ -8,9 +8,28 @@ TestResults/
 
 # Local configuration and secrets
 .env
+.env.local
 .env.*
 !.env.example
+frontend/.env*
+src/SmartSpace.UI/.env*
+**/.env
+**/.env.local
+**/.env.*
+!**/.env.example
 **/appsettings.Development.json
+
+# Frontend/build output and local test results
+.next/
+**/.next/
+node_modules/
+**/node_modules/
+bin/
+obj/
+**/bin/
+**/obj/
+TestResults/
+**/TestResults/
 
 # Tooling
 .vscode/

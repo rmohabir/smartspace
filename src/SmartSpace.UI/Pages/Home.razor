@@ -1,7 +1,41 @@
 ﻿@page "/"
 
-<PageTitle>Home</PageTitle>
+<PageTitle>SmartSpace</PageTitle>
 
-<h1>Hello, world!</h1>
+<section class="smartspace-hero" aria-labelledby="page-title">
+	<p class="eyebrow">BIDN · SmartSpace</p>
+	<h1 id="page-title">Vind een ruimte voor je overleg</h1>
+	<p class="lead">Vergaderruimtes zoeken, reserveringen beheren en ruimtebeheer op één plek.</p>
+</section>
 
-Welcome to your new app.
+<section class="workflow-grid" aria-label="SmartSpace release 1">
+	<article class="workflow-card workflow-card-primary">
+		<p class="eyebrow">Medewerker</p>
+		<h2>Beschikbaarheid</h2>
+		<p>Zoek een vergaderruimte op tijd, locatie en capaciteit.</p>
+		<a class="btn btn-primary" href="beschikbaarheid">Ruimte zoeken</a>
+	</article>
+
+	<article class="workflow-card">
+		<p class="eyebrow">Mijn werk</p>
+		<h2>Mijn reserveringen</h2>
+		<p>Bekijk komende, afgelopen en geannuleerde reserveringen.</p>
+		<a class="btn btn-outline-primary" href="mijn-reserveringen">Overzicht openen</a>
+	</article>
+
+	<article class="workflow-card">
+		<p class="eyebrow">Beheer</p>
+		<h2>Ruimtes beheren</h2>
+		<p>Onderhoud de vergaderruimtecatalogus als beheerder.</p>
+		<a class="btn btn-outline-primary" href="beheer/ruimtes">Beheer openen</a>
+	</article>
+</section>
+
+<section class="status-panel" aria-labelledby="status-title">
+	<div>
+		<p class="eyebrow">Foundation</p>
+		<h2 id="status-title">Release 1 in opbouw</h2>
+		<p>De applicatieshell en databasefundamenten staan klaar. De boekingsflows volgen per user story.</p>
+	</div>
+	<span class="status-badge">Foundation</span>
+</section>

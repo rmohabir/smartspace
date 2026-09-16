@@ -51,6 +51,12 @@ app.UseExceptionHandler();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => Results.Ok(new
+{
+	name = "SmartSpace",
+	status = "Foundation",
+	release = "Release 1",
+	message = "Vergaderruimte-reserveringen voor BIDN"
+}));
 
 app.Run();
