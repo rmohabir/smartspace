@@ -1,0 +1,385 @@
+openapi: 3.0.3
+info:
+  title: SmartSpace API
+  version: 1.0.0-draft
+  description: |
+    Voorgesteld contract voor SmartSpace release 1. Contract is niet goedgekeurd
+    zolang de constitutionele stackafwijking en open BIDN-besluiten niet zijn gesloten.
+servers:
+  - url: http://localhost:5080
+    description: Development API
+security:
+  - developmentIdentity: []
+tags:
+  - name: Locations
+  - name: Rooms
+  - name: Reservations
+  - name: Administration
+paths:
+  /api/locations:
+    get:
+      tags: [Locations]
+      summary: List active locations
+      responses:
+        '200':
+          description: Active locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+  /api/rooms:
+    get:
+      tags: [Rooms]
+      summary: List rooms
+      parameters:
+        - $ref: '#/components/parameters/LocationId'
+        - $ref: '#/components/parameters/MinCapacity'
+      responses:
+        '200':
+          description: Active room catalog
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+  /api/rooms/availability:
+    get:
+      tags: [Rooms]
+      summary: Find rooms available for an exact interval
+      parameters:
+        - $ref: '#/components/parameters/Start'
+        - $ref: '#/components/parameters/End'
+        - $ref: '#/components/parameters/LocationId'
+        - $ref: '#/components/parameters/MinCapacity'
+      responses:
+        '200':
+          description: Matching rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /api/rooms/{id}:
+    get:
+      tags: [Rooms]
+      summary: Get room details
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      responses:
+        '200':
+          description: Room details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /api/reservations/mine:
+    get:
+      tags: [Reservations]
+      summary: List the current user's reservations
+      parameters:
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [upcoming, past, cancelled]
+            default: upcoming
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: pageSize
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Own reservations only
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /api/reservations/{id}:
+    get:
+      tags: [Reservations]
+      summary: Get an accessible own reservation
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      responses:
+        '200':
+          description: Own reservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags: [Reservations]
+      summary: Update an own future active reservation
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateReservationRequest'
+      responses:
+        '200':
+          description: Updated reservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/reservations:
+    post:
+      tags: [Reservations]
+      summary: Create an own reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateReservationRequest'
+      responses:
+        '201':
+          description: Created reservation
+          headers:
+            Location:
+              schema: { type: string, format: uri-reference }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/reservations/{id}/cancel:
+    post:
+      tags: [Reservations]
+      summary: Cancel an own future active reservation
+      parameters:
+        - $ref: '#/components/parameters/ReservationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CancelReservationRequest'
+      responses:
+        '200':
+          description: Cancelled reservation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/admin/rooms:
+    post:
+      tags: [Administration]
+      summary: Create a room
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomCreateRequest'
+      responses:
+        '201':
+          description: Created room
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Room' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /api/admin/rooms/{id}:
+    put:
+      tags: [Administration]
+      summary: Update room configuration
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoomWriteRequest'
+      responses:
+        '200':
+          description: Updated room
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Room' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+  /api/admin/rooms/{id}/deactivate:
+    post:
+      tags: [Administration]
+      summary: Deactivate a room without active current/future bookings
+      parameters:
+        - $ref: '#/components/parameters/RoomId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersionRequest'
+      responses:
+        '200':
+          description: Deactivated room
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Room' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+components:
+  securitySchemes:
+    developmentIdentity:
+      type: http
+      scheme: bearer
+      bearerFormat: development-only
+  parameters:
+    LocationId:
+      name: locationId
+      in: query
+      required: false
+      schema: { type: string, format: uuid }
+    MinCapacity:
+      name: minCapacity
+      in: query
+      required: false
+      schema: { type: integer, minimum: 1 }
+    Start:
+      name: start
+      in: query
+      required: true
+      schema: { type: string, format: date-time }
+    End:
+      name: end
+      in: query
+      required: true
+      schema: { type: string, format: date-time }
+    RoomId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    ReservationId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  schemas:
+    Location:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        building: { type: string, nullable: true }
+        floor: { type: string, nullable: true }
+    Room:
+      type: object
+      required: [id, name, capacity, locationId, isActive, version]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        capacity: { type: integer, minimum: 1 }
+        locationId: { type: string, format: uuid }
+        locationName: { type: string }
+        isActive: { type: boolean }
+        version: { type: string, format: uuid }
+    Reservation:
+      type: object
+      required: [id, roomId, roomName, locationName, start, end, status, version]
+      properties:
+        id: { type: string, format: uuid }
+        roomId: { type: string, format: uuid }
+        roomName: { type: string }
+        locationName: { type: string }
+        start: { type: string, format: date-time }
+        end: { type: string, format: date-time }
+        status: { type: string, enum: [Active, Cancelled] }
+        version: { type: string, format: uuid }
+    CreateReservationRequest:
+      type: object
+      required: [roomId, start, end]
+      properties:
+        roomId: { type: string, format: uuid }
+        start: { type: string, format: date-time }
+        end: { type: string, format: date-time }
+    UpdateReservationRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateReservationRequest'
+        - $ref: '#/components/schemas/VersionRequest'
+    CancelReservationRequest:
+      $ref: '#/components/schemas/VersionRequest'
+    RoomWriteRequest:
+      type: object
+      required: [name, capacity, locationId, version]
+      properties:
+        name: { type: string }
+        capacity: { type: integer, minimum: 1 }
+        locationId: { type: string, format: uuid }
+        version: { type: string, format: uuid }
+    RoomCreateRequest:
+      type: object
+      required: [name, capacity, locationId]
+      properties:
+        name: { type: string }
+        capacity: { type: integer, minimum: 1 }
+        locationId: { type: string, format: uuid }
+    VersionRequest:
+      type: object
+      required: [version]
+      properties:
+        version: { type: string, format: uuid }
+    ProblemDetails:
+      type: object
+      required: [title, status, code]
+      properties:
+        type: { type: string, format: uri-reference }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+        code: { type: string, example: booking_overlap }
+        traceId: { type: string }
+  responses:
+    BadRequest:
+      description: Invalid input or local time
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    NotFound:
+      description: Not found or not accessible
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }
+    Conflict:
+      description: Overlap, stale version or lifecycle policy conflict
+      content:
+        application/problem+json:
+          schema: { $ref: '#/components/schemas/ProblemDetails' }

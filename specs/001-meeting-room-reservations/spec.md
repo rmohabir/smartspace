@@ -8,6 +8,14 @@
 
 **Input**: User description: "Specificeer SmartSpace release 1 voor het reserveren van vergaderruimtes binnen BIDN"
 
+## Clarifications
+
+### Session 2026-09-16
+
+- Q: Mag een beheerder reserveringen van andere medewerkers inzien, wijzigen of annuleren? → A: Optie A: nee; een beheerder beheert alleen ruimtes en reserveringen blijven onder beheer van de eigenaar.
+- Q: Moet het eindtijdstip exclusief zijn, zodat een reservering van 10:00–11:00 direct gevolgd mag worden door een reservering van 11:00–12:00? → A: Optie A: ja; aansluitende tijdvakken zijn toegestaan en een eventuele buffer is een afzonderlijk open beleidsbesluit.
+- Q: Hoe moet SmartSpace omgaan met lokale tijden in Europe/Amsterdam die tijdens zomer- of wintertijd niet bestaan of dubbel voorkomen? → A: Optie A: niet-bestaande lokale tijden worden geweigerd en bij dubbel voorkomende tijden kiest de medewerker expliciet.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Beschikbare vergaderruimte vinden (Priority: P1)
@@ -63,7 +71,8 @@ de reservering bevestigen en daarna de reservering terugvinden in het eigen over
    geen nieuwe actieve reservering aangemaakt.
 4. **Given** een aanvraag voor een tijdvak sluit direct aan op een bestaande actieve
    reservering, **When** de medewerker boekt, **Then** wordt de aanvraag toegestaan
-   zolang geen bevestigd beleid een buffer vereist.
+  omdat het eindtijdstip exclusief is; een eventuele buffer is geen onderdeel van
+  deze bevestigde grensregel.
 
 ### User Story 3 - Eigen reserveringen en historie beheren (Priority: P1)
 
@@ -125,6 +134,10 @@ kan vinden.
 5. **Given** een medewerker zonder beheerdersrechten probeert ruimtebeheer te
    gebruiken, **When** de medewerker een beheeractie uitvoert, **Then** wordt de
    actie geweigerd en worden geen gegevens gewijzigd.
+6. **Given** een beheerder probeert een reservering van een andere medewerker te
+  beheren, **When** de beheerder de reservering opent of een mutatie uitvoert,
+  **Then** wordt de actie geweigerd en blijven de reservering en persoonsgegevens
+  van de eigenaar beschermd.
 
 ### Edge Cases
 
@@ -133,7 +146,8 @@ kan vinden.
 - Een nieuw of gewijzigd tijdvak dat al is begonnen of verstreken wordt afgewezen;
   dit is een labvoorstel dat vóór productgebruik moet worden bevestigd.
 - Een zoekopdracht met een ontbrekend, onjuist of dubbelzinnig lokaal tijdstip wordt
-  niet stilzwijgend geïnterpreteerd; de medewerker krijgt een keuze of foutmelding.
+  niet stilzwijgend geïnterpreteerd; niet-bestaande tijden worden geweigerd en bij
+  dubbel voorkomende tijden kiest de medewerker expliciet.
 - Een geannuleerde reservering blokkeert geen nieuw aansluitend of overlappend
   tijdvak.
 - Een wijziging met een verouderde weergave mag geen recente wijziging overschrijven;
@@ -159,8 +173,9 @@ kan vinden.
   BIDN haar bevestigt.
 - **FR-005**: Het systeem MUST actieve overlappende reserveringen voor dezelfde ruimte
   voorkomen, ook wanneer aanvragen gelijktijdig binnenkomen.
-- **FR-006**: Het systeem MUST aansluitende tijdvakken toestaan wanneer het gekozen
-  beleid geen buffer voorschrijft; een buffer is een open productbesluit.
+- **FR-006**: Het systeem MUST aansluitende tijdvakken toestaan op basis van een
+  exclusief eindtijdstip. Een eventuele buffer is een afzonderlijk open
+  productbesluit en mag niet stilzwijgend worden toegevoegd.
 - **FR-007**: Het systeem MUST een reservering aan de ingelogde medewerker koppelen
   en mag de eigenaar niet uit vrije invoer van de medewerker overnemen.
 - **FR-008**: Het systeem MUST medewerkers hun eigen toekomstige actieve reserveringen
@@ -182,9 +197,11 @@ kan vinden.
 - **FR-015**: Het systeem MUST inactieve ruimtes uitsluiten van nieuwe
   beschikbaarheids- en boekingsresultaten, terwijl relevante historie behouden blijft.
 - **FR-016**: Het systeem MUST beheeracties van onbevoegde medewerkers weigeren en
-  geen wijziging uitvoeren.
-- **FR-017**: Het systeem MUST tijden begrijpelijk tonen in Europe/Amsterdam en
-  ongeldige of dubbelzinnige lokale tijden expliciet afhandelen.
+  geen wijziging uitvoeren. De beheerdersrol geeft in release 1 geen recht om
+  reserveringen van andere medewerkers in te zien, te wijzigen of te annuleren.
+- **FR-017**: Het systeem MUST tijden begrijpelijk tonen in Europe/Amsterdam,
+  niet-bestaande lokale tijden weigeren en de medewerker bij dubbel voorkomende
+  lokale tijden expliciet laten kiezen.
 - **FR-018**: Het systeem MUST bij validatie-, conflict-, autorisatie- en tijdelijke
   beschikbaarheidsfouten een begrijpelijke melding tonen zonder gevoelige details.
 - **FR-019**: Het systeem MUST de status en historie van reserveringen behouden na
@@ -201,11 +218,21 @@ stilzwijgend goedgekeurd:
 - **Labvoorstel**: aansluitende tijdvakken zijn toegestaan zonder buffer.
 - **Open productbesluit**: zijn buffers, openingstijden, maximale duur of een
   boekingshorizon nodig?
-- **Open productbesluit**: mag een beheerder reserveringen van andere medewerkers
-  beheren, en welke gegevens mag die rol zien?
+- **Bevestigd besluit**: een beheerder beheert in release 1 alleen ruimtes en mag
+  geen reserveringen van andere medewerkers inzien, wijzigen of annuleren.
+- **Bevestigd besluit**: Europe/Amsterdam is de invoer- en weergavetijdzone; een
+  niet-bestaande lokale tijd wordt geweigerd en een dubbel voorkomende lokale tijd
+  vereist een expliciete keuze.
 - **Open productbesluit**: hoe worden reserveringen beheerd bij afwezigheid van de
   eigenaar of bij een lopende reservering?
 - **Open productbesluit**: welke bewaartermijn en privacyregels gelden voor historie?
+- **Open productbesluit**: toont historie de ruimtegegevens zoals die bij het boeken
+  golden, of altijd de actuele ruimtegegevens?
+- **Labvoorstel**: een herhaalde annulering van een al geannuleerde eigen
+  reservering is zonder neveneffect succesvol; de eerste annulering blijft aan
+  eigenaarschap en geldige versie onderworpen.
+- **Open productbesluit**: wat betekent "lopende" reservering precies op de grens
+  van het actuele tijdstip, inclusief eventuele klokmarge?
 - **Bronstatus**: `StakeholderDocuments/OpenQuestions.md` was niet aanwezig; de
   resterende open punten uit `TechStack.md` §15 moeten door BIDN worden bevestigd.
 
@@ -260,12 +287,12 @@ stilzwijgend goedgekeurd:
   uitbreidingsmodel.
 - Een actieve reservering blokkeert een overlappend tijdvak; een geannuleerde
   reservering doet dat niet.
-- Zonder bevestigd bufferbeleid zijn intervallen die exact op elkaar aansluiten
-  toegestaan. Dit blijft een labvoorstel.
+- Release 1 gebruikt een exclusief eindtijdstip; intervallen die exact op elkaar
+  aansluiten zijn toegestaan. Een eventuele buffer blijft een open productbesluit.
 - Zonder bevestigd boekingsbeleid wordt een reservering met een start in het verleden
   of heden afgewezen. Dit blijft een labvoorstel.
 - De lokale interface gebruikt Europe/Amsterdam voor invoer en weergave; ongeldige
-  zomertijdgevallen worden niet stilzwijgend aangepast.
+  zomertijdgevallen worden geweigerd en dubbel voorkomende tijden vragen een keuze.
 - De trainingsdemo gebruikt synthetische gegevens en vormt geen productieacceptatie.
 - De ontbrekende `OpenQuestions.md` kan aanvullende besluiten bevatten; totdat die
   bron beschikbaar is, zijn de hierboven gemarkeerde open productbesluiten niet
