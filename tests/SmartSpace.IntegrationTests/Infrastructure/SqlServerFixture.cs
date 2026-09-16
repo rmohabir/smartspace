@@ -5,7 +5,10 @@ namespace SmartSpace.IntegrationTests.Infrastructure;
 
 public sealed class SqlServerFixture : IAsyncLifetime
 {
-    public string? ConnectionString => Environment.GetEnvironmentVariable("SMARTSPACE_SQLSERVER_CONNECTION");
+    public string? ConnectionString =>
+        Environment.GetEnvironmentVariable("SMARTSPACE_SQLSERVER_CONNECTION")
+        ?? Environment.GetEnvironmentVariable("ConnectionStrings__SmartSpace");
+
     public bool IsAvailable => !string.IsNullOrWhiteSpace(ConnectionString);
 
     public SmartSpaceDbContext CreateDbContext()
@@ -22,7 +25,27 @@ public sealed class SqlServerFixture : IAsyncLifetime
         return new SmartSpaceDbContext(options);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public async Task InitializeAsync()
+    {
+        if (!IsAvailable)
+        {
+            return;
+        }
+
+        await using var db = CreateDbContext();
+        await db.Database.MigrateAsync();
+    }
+
+    public async Task ResetAsync()
+    {
+        if (!IsAvailable)
+        {
+            return;
+        }
+
+        await using var db = CreateDbContext();
+        await db.Database.ExecuteSqlRawAsync("DELETE FROM Reservations; DELETE FROM Resources; DELETE FROM Locations;");
+    }
 
     public Task DisposeAsync() => Task.CompletedTask;
 }

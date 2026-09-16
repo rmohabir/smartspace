@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
+using SmartSpace.Api;
 using SmartSpace.Api.Data;
+using SmartSpace.Api.Features.Rooms;
 using SmartSpace.Api.Infrastructure;
 using SmartSpace.Api.Security;
 
@@ -10,7 +12,7 @@ var developmentIdentity = builder.Configuration
 	.GetSection(DevelopmentIdentityOptions.SectionName)
 	.Get<DevelopmentIdentityOptions>() ?? new DevelopmentIdentityOptions();
 
-if (developmentIdentity.Enabled && !builder.Environment.IsDevelopment())
+if (developmentIdentity.Enabled && !developmentIdentity.IsAllowedInEnvironment(builder.Environment))
 {
 	throw new InvalidOperationException("Development identity is only allowed in Development.");
 }
@@ -38,6 +40,7 @@ else
 builder.Services.AddAuthorization(options =>
 	options.AddPolicy(AuthorizationPolicies.Administrator, policy =>
 		policy.RequireRole("Administrator")));
+builder.Services.AddScoped<RoomAvailabilityService>();
 
 var app = builder.Build();
 
@@ -58,5 +61,7 @@ app.MapGet("/", () => Results.Ok(new
 	release = "Release 1",
 	message = "Vergaderruimte-reserveringen voor BIDN"
 }));
+
+app.MapRoomsEndpoints();
 
 app.Run();
