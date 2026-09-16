@@ -2,7 +2,7 @@ SmartSpace — Reserveringssysteem voor vergaderruimtes en werkplekken
 
 Status en gebruik
 
-Techstack, systeemontwerp en bouwinstructie voor het SmartSpace-trainingsprototype bij BIDN. Dit document vervangt de RSS Feed Reader-casus en is bruikbaar als input voor Spec-Driven Development en AI-assisted implementatie. De applicatie is met dit document nog niet gebouwd of getest.
+Techstack, systeemontwerp en bouwinstructie voor het SmartSpace-trainingsprototype bij BIDN. Dit document vervangt de RSS Feed Reader-casus en is bruikbaar als input voor Spec-Driven Development en AI-assisted implementatie. De applicatie is met dit document nog niet gebouwd of getest. Het document is ontwerpinput en geen goedgekeurde productspecificatie.
 
 De eerste release richt zich op vergaderruimtes. Werkplekken worden meegenomen in het datamodel, maar nog niet als gebruikersfunctionaliteit gebouwd. Aanvullende beleidskeuzes zijn hieronder expliciet als voorstel gemarkeerd; ze zijn nog niet door BIDN gevalideerd.
 
@@ -10,7 +10,7 @@ De eerste release richt zich op vergaderruimtes. Werkplekken worden meegenomen i
 
 Binnen BIDN bestaat behoefte aan een centrale oplossing voor het reserveren van vergaderruimtes en op termijn flexwerkplekken. De AI-training heeft daarmee een daadwerkelijk bedrijfsdoel.
 
-Deelnemers werken gezamenlijk aan een gevalideerde productspecificatie, een eerste systeemontwerp, een backlog, een technisch prototype en vastgelegde architectuur- en ontwerpbeslissingen. De resultaten moeten bruikbaar blijven als startpunt voor eventuele realisatie binnen BIDN.
+Deelnemers werken gezamenlijk aan een te valideren productspecificatie, een eerste systeemontwerp, een backlog, een technisch prototype en vastgelegde architectuur- en ontwerpbeslissingen. De resultaten moeten bruikbaar blijven als startpunt voor eventuele realisatie binnen BIDN.
 
 SmartSpace stelt medewerkers in staat beschikbare ruimtes te raadplegen, reserveringen aan te maken, te wijzigen en te annuleren, en eigen reserveringen inclusief historie te bekijken. Beheerders configureren ruimtes, capaciteit en locatie.
 

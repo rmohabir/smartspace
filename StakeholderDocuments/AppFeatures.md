@@ -1,4 +1,9 @@
 # SmartSpace eerste release
+
+> Status: stakeholderinput voor de training. Dit document is nog geen
+> goedgekeurde productspecificatie. Regels onder "Vaststaande businessregels"
+> zijn de oorspronkelijke scope- en businessinput; labvoorstellen staan apart
+> en moeten door BIDN worden bevestigd.
  
 ## Medewerker
 - Ruimtes bekijken met naam, capaciteit en locatie.
@@ -15,7 +20,7 @@
   reserveringen meer bestaan.
 - Geen extra bevoegdheden over boekingen van andere medewerkers.
  
-## Regels
+## Vaststaande businessregels
 - Een reservering heeft een begin- en eindtijd; einde ligt na begin.
 - Een nieuwe of gewijzigde boeking begint in de toekomst.
 - Aansluitende boekingen mogen; overlappende actieve boekingen niet.
@@ -25,8 +30,19 @@
 - Historische reserveringen blijven voor de eigenaar raadpleegbaar.
 - Andere medewerkers zien geen persoonsgegevens in beschikbaarheid.
 - De lokale UI toont tijden voor Europe/Amsterdam.
+
+## Labvoorstellen en te bevestigen uitwerkingen
+- Nieuwe of gewijzigde boekingen moeten in de toekomst beginnen; dit is nog te
+  bevestigen als beleid voor lopende of direct aansluitende boekingen.
+- Aansluitende boekingen zonder buffer zijn toegestaan; een eventuele buffer
+  moet als BIDN-beleid worden vastgesteld.
+- Deactiveren wordt geweigerd zolang actieve lopende of toekomstige
+  reserveringen bestaan; de precieze beheerprocedure en bevoegdheden zijn nog
+  open.
  
 ## Grenzen
 Geen herhaalboekingen, notificaties, deelnemerslijsten of integraties.
 Geen werkplekfunctionaliteit in release 1.
-Overige beleidskeuzes staan in OpenQuestions.md en moeten worden bevestigd.
+Overige open besluiten staan in [TechStack.md](TechStack.md), §15, en moeten
+worden bevestigd. Dit voorkomt een verwijzing naar het ontbrekende bestand
+`OpenQuestions.md`.
