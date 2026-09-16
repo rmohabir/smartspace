@@ -22,6 +22,9 @@
 - Q: Wanneer geldt een reservering als "lopend" voor ruimte-deactivering en beheerdersacties? → A: Optie A: lopend bij `start <= nu < end`; vanaf het exclusieve eindtijdstip is de reservering afgelopen.
 - Q: Mag een beheerder een gedeactiveerde ruimte later opnieuw activeren? → A: Optie A: ja; een beheerder mag activeren zolang de locatie actief is.
 - Q: Moeten databaseconflicten en tijdelijke SQL Server-bezetting automatisch worden herhaald, en zo ja, hoeveel keer? → A: maximaal drie retries met begrensde backoff bij tijdelijke bezetting; geen blinde retry bij een onbekende commituitkomst.
+- Q: Hoe legt de client de keuze vast bij een dubbel lokaal tijdstip? → A: de client verstuurt een offset-aware RFC 3339 tijdstip; de gekozen UTC-offset onderscheidt de eerste en tweede occurrence en de server bewaart het overeenkomstige instant.
+- Q: Wat gebeurt er bij een herhaalde annulering? → A: een tweede annulering van dezelfde reservering is idempotent succesvol en heeft geen neveneffect; de API retourneert `204 No Content`.
+- Q: Welke gebruikersactie hoort bij de verschillende foutcategorieën? → A: validatiefouten worden gecorrigeerd, conflicten tonen de actuele status en vragen opnieuw laden, autorisatiefouten tonen toegang geweigerd, en tijdelijke beschikbaarheidsfouten bieden opnieuw proberen met maximaal drie begrensde retries.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -210,9 +213,16 @@ kan vinden.
   ook wanneer de eigenaar afwezig is of de reservering al loopt.
 - **FR-017**: Het systeem MUST tijden begrijpelijk tonen in Europe/Amsterdam,
   niet-bestaande lokale tijden weigeren en de medewerker bij dubbel voorkomende
-  lokale tijden expliciet laten kiezen.
+  lokale tijden expliciet laten kiezen. De client MUST de keuze als een offset-aware
+  RFC 3339 tijdstip versturen; de server MUST de offset gebruiken om het instant te
+  bepalen en mag geen server- of lokale tijdzone als stille fallback gebruiken.
 - **FR-018**: Het systeem MUST bij validatie-, conflict-, autorisatie- en tijdelijke
   beschikbaarheidsfouten een begrijpelijke melding tonen zonder gevoelige details.
+  De stabiele foutcodes zijn `validation_error`, `booking_overlap`,
+  `stale_version`, `forbidden` en `temporary_persistence_error`. De client corrigeert
+  validatie, toont bij conflict of stale versie de actuele status en laat opnieuw
+  laden, toont bij `forbidden` een toegangsweigering en biedt bij tijdelijke fouten
+  opnieuw proberen.
 - **FR-019**: Het systeem MUST de status en historie van reserveringen behouden na
   annulering en mag reserveringen of gerefereerde ruimtes niet hard verwijderen.
 - **FR-020**: Het systeem MUST requirements, user stories, scenario's en tests
@@ -239,17 +249,21 @@ stilzwijgend goedgekeurd:
   hun beheerhandeling.
 - **Bevestigd besluit**: historie toont de naam, locatie en capaciteit zoals die bij
   het boeken golden.
-- **Labvoorstel**: een herhaalde annulering van een al geannuleerde eigen
-  reservering is zonder neveneffect succesvol; de eerste annulering blijft aan
-  eigenaarschap en geldige versie onderworpen.
+- **Bevestigd besluit**: een herhaalde annulering van een al geannuleerde eigen
+  reservering is zonder neveneffect succesvol en retourneert `204 No Content`;
+  de eerste annulering blijft aan eigenaarschap en geldige versie onderworpen.
 - **Bevestigd besluit**: een reservering is lopend bij `start <= nu < end`; vanaf
   het exclusieve eindtijdstip is zij afgelopen en blokkeert zij deactivering niet
   meer.
 - **Bevestigd besluit**: tijdelijke SQL Server-bezetting mag maximaal drie keer
   opnieuw worden geprobeerd met begrensde backoff. Bij een onbekende commituitkomst
   wordt niet blind opnieuw geprobeerd.
+- **Bevestigd besluit**: BIDN Product Owner is eigenaar van deze release-1
+  beslissingen; besluiten worden vastgelegd vóór implementatie van de betrokken
+  user story en opnieuw gecontroleerd tijdens de release review van 2026-09-16.
 - **Bronstatus**: `StakeholderDocuments/OpenQuestions.md` was niet aanwezig; de
-  resterende open punten uit `TechStack.md` §15 moeten door BIDN worden bevestigd.
+  resterende open punten uit `TechStack.md` §15 zijn voor deze release door de
+  Product Owner ingevuld volgens bovenstaande besluiten.
 
 ### Key Entities *(include if feature involves data)*
 

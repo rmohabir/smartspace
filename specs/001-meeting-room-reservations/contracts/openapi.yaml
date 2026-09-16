@@ -3,8 +3,8 @@ info:
   title: SmartSpace API
   version: 1.0.0-draft
   description: |
-    Voorgesteld contract voor SmartSpace release 1. Contract is niet goedgekeurd
-    zolang de constitutionele stackafwijking en open BIDN-besluiten niet zijn gesloten.
+    Contract voor SmartSpace release 1. Local date-time choices are represented by
+    offset-aware RFC 3339 values; clients use stable problem codes for recovery actions.
 servers:
   - url: http://localhost:5080
     description: Development API
@@ -180,11 +180,13 @@ paths:
               $ref: '#/components/schemas/CancelReservationRequest'
       responses:
         '200':
-          description: Cancelled reservation
+          description: Reservation cancelled by the first cancellation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reservation'
+        '204':
+          description: Reservation was already cancelled; operation is idempotently successful
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
   /api/admin/rooms:
@@ -286,12 +288,14 @@ components:
       name: start
       in: query
       required: true
-      schema: { type: string, format: date-time }
+      description: Offset-aware RFC 3339 instant selected by the user in Europe/Amsterdam.
+      schema: { type: string, format: date-time, example: '2026-10-25T02:30:00+02:00' }
     End:
       name: end
       in: query
       required: true
-      schema: { type: string, format: date-time }
+      description: Offset-aware RFC 3339 instant selected by the user in Europe/Amsterdam.
+      schema: { type: string, format: date-time, example: '2026-10-25T03:30:00+01:00' }
     RoomId:
       name: id
       in: path
@@ -375,7 +379,10 @@ components:
         title: { type: string }
         status: { type: integer }
         detail: { type: string }
-        code: { type: string, example: booking_overlap }
+        code:
+          type: string
+          enum: [validation_error, booking_overlap, stale_version, forbidden, temporary_persistence_error]
+          example: booking_overlap
         traceId: { type: string }
   responses:
     BadRequest:

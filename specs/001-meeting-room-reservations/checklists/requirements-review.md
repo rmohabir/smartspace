@@ -48,8 +48,8 @@ niet dat implementatie of tests zijn uitgevoerd.
   - Beoordeling: ja; zulke tijden worden geweigerd.
 - [x] CHK013 Is gedrag voor dubbel voorkomende wintertijdtijden expliciet? [Edge Case, Spec FR-017]
   - Beoordeling: ja; de medewerker moet expliciet kiezen.
-- [ ] CHK014 Is de representatie van een expliciete keuze bij een dubbel lokaal tijdstip voor gebruikers en contract volledig gedefinieerd? [Clarity, Spec FR-017 / Plan OpenAPI]
-  - Bevinding: nee; de uitkomst is duidelijk, maar het onderscheidende invoercriterium of contractveld is nog niet beschreven.
+- [x] CHK014 Is de representatie van een expliciete keuze bij een dubbel lokaal tijdstip voor gebruikers en contract volledig gedefinieerd? [Clarity, Spec FR-017 / Plan OpenAPI]
+  - Beoordeling: ja; de client verstuurt een offset-aware RFC 3339 tijdstip en de gekozen UTC-offset onderscheidt beide occurrences.
 - [x] CHK015 Is stille interpretatie door de server- of lokale tijdzone uitgesloten? [Consistency, Spec Edge Cases]
   - Beoordeling: ja; de spec verbiedt stille tijdverschuiving en het plan noemt expliciete offset/instant.
 
@@ -57,8 +57,8 @@ niet dat implementatie of tests zijn uitgevoerd.
 
 - [x] CHK016 Is annulering beschreven als behoud van historie en vrijgeven van het tijdvak? [Completeness, Spec FR-010/FR-011]
   - Beoordeling: ja; statusbehoud en beschikbaarheid zijn beide opgenomen.
-- [ ] CHK017 Is vastgelegd of een herhaalde annulering idempotent succesvol is of een conflict oplevert? [Ambiguity, Spec Labvoorstel]
-  - Bevinding: nee; dit is nu expliciet als labvoorstel opgenomen, maar nog geen bevestigd productbesluit.
+- [x] CHK017 Is vastgelegd of een herhaalde annulering idempotent succesvol is of een conflict oplevert? [Ambiguity, Spec Labvoorstel]
+  - Beoordeling: ja; een tweede annulering is idempotent succesvol en retourneert `204 No Content` zonder neveneffect.
 - [x] CHK018 Is de grens vastgelegd dat reserveringen niet hard worden verwijderd? [Clarity, Spec FR-019]
   - Beoordeling: ja; ook de plan- en datamodelartefacts herhalen dit.
 - [x] CHK019 Is duidelijk welke ruimtegegevens historische reserveringen tonen na een latere ruimtewijziging? [Clarity, Spec Clarifications]
@@ -91,8 +91,8 @@ niet dat implementatie of tests zijn uitgevoerd.
   - Beoordeling: ja.
 - [x] CHK030 Zijn conflict, stale-versie, ongeautoriseerde toegang en tijdelijke beschikbaarheidsfout onderscheiden? [Completeness, Plan/API]
   - Beoordeling: grotendeels; conflict, autorisatie en tijdelijke fout zijn beschreven. De exacte stale-versie-eis staat in het plan/OpenAPI, niet volledig als genummerde spec-FR.
-- [ ] CHK031 Is voor iedere foutcategorie een stabiele gebruikersbetekenis en grens tussen retry, conflict en opnieuw laden vastgelegd? [Clarity, Spec FR-018 / Plan]
-  - Bevinding: gedeeltelijk; begrijpelijke meldingen zijn vereist, maar retry/reloadbeleid en alle foutcodes zijn nog niet volledig als productrequirement vastgelegd.
+- [x] CHK031 Is voor iedere foutcategorie een stabiele gebruikersbetekenis en grens tussen retry, conflict en opnieuw laden vastgelegd? [Clarity, Spec FR-018 / Plan]
+  - Beoordeling: ja; stabiele codes en acties zijn vastgelegd: corrigeren, actuele status laden, toegang weigeren of opnieuw proberen.
 - [x] CHK032 Zijn lege resultaten onderscheiden van technische fouten? [Clarity, Spec US1]
   - Beoordeling: ja.
 - [x] CHK033 Zijn scopegrenzen voor werkplekken, notificaties, externe integraties en rapportages expliciet? [Completeness, Spec Out of Scope]
@@ -108,8 +108,8 @@ niet dat implementatie of tests zijn uitgevoerd.
   - Beoordeling: ja; de artefacts claimen geen code- of producttest.
 - [x] CHK037 Is het OpenAPI-contract inhoudelijk consistent met create versus update van ruimtes? [Consistency, OpenAPI]
   - Beoordeling: ja na review; `RoomCreateRequest` vereist geen `version`, update wel.
-- [ ] CHK038 Zijn alle voorstellen en open besluiten traceerbaar naar een eigenaar en beslismoment? [Traceability, Spec/Plan]
-  - Bevinding: nee; verantwoordelijke BIDN-rollen en besluitmomenten zijn niet ingevuld.
+- [x] CHK038 Zijn alle voorstellen en open besluiten traceerbaar naar een eigenaar en beslismoment? [Traceability, Spec/Plan]
+  - Beoordeling: ja; de BIDN Product Owner is eigenaar en het besluitmoment is de release review van 2026-09-16.
 
 ## Notes
 

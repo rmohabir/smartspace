@@ -148,13 +148,25 @@ en EF-entiteiten lekken niet naar de HTTP-contracten.
 1. **Unit tests**: tijdvakvalidatie, halfopen overlap, statusovergangen, ownership-
    beslissingen, DTO-validatie en ProblemDetails-mapping.
 2. **SQL Server integration tests**: migrations, foreign keys, persistence,
-  cancellation/history, voorgestelde idempotente herhaalde annulering,
+  cancellation/history, idempotente herhaalde annulering,
   deactivation guards en minimaal 100 paren gelijktijdige
    create requests met afzonderlijke API-processen of equivalent geïsoleerde
    processen. Assert responses én database-invariant.
 3. **Browser tests**: zoeken, filteren, boeken, wijziging met conflict, annuleren,
    eigen historie, onbevoegd beheer, beheerflow, foutmeldingen, keyboardbediening,
    375/768/1440 px en zomertijdgevallen.
+
+## Confirmed Product Decisions
+
+- Ambiguous Europe/Amsterdam local times are represented by offset-aware RFC 3339
+  values; the selected UTC offset is the explicit user choice.
+- A repeated cancellation is idempotent and returns `204 No Content` without a
+  second state change.
+- Error handling uses stable codes and explicit client actions: correct validation,
+  reload after conflict or stale version, deny forbidden actions, and retry temporary
+  persistence failures with bounded retry policy.
+- The BIDN Product Owner owns these decisions; they are recorded before the related
+  story is implemented and reviewed at the release review on 2026-09-16.
 
 ## Post-Design Constitution Re-check
 
