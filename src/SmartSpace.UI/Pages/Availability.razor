@@ -11,7 +11,7 @@
 </section>
 
 <section class="search-panel" aria-labelledby="search-title">
-    <h2 id="search-title">Zoek een ruimte</h2>
+    <h2 id="search-title">Zoek een ruimte voor jay</h2>
     <form @onsubmit="SearchAsync" @onsubmit:preventDefault="true">
         <div class="search-grid">
             <div class="field-group">
@@ -99,6 +99,7 @@ else if (rooms.Count > 0)
                     <h3>@room.Name</h3>
                     <p>Capaciteit: @room.Capacity personen</p>
                     <span class="status-badge">Vrij voor jouw tijdvak</span>
+                    <a class="btn btn-primary" href="reserveren/@room.Id">Reserveren</a>
                 </article>
             }
         </div>

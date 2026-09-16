@@ -1,0 +1,17 @@
+@page "/reserveren/{ResourceId:guid}"
+@using SmartSpace.UI.Components.Reservations
+
+<PageTitle>Ruimte reserveren | SmartSpace</PageTitle>
+
+<section class="page-heading" aria-labelledby="booking-title">
+    <p class="eyebrow">Medewerker</p>
+    <h1 id="booking-title">Ruimte reserveren</h1>
+    <p>Controleer het tijdvak en bevestig je reservering.</p>
+</section>
+
+<BookingForm ResourceId="ResourceId" />
+
+@code {
+    [Parameter]
+    public Guid ResourceId { get; set; }
+}

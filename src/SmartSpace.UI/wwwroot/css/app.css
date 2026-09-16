@@ -185,6 +185,10 @@ a, .btn-link {
     margin-top: 0;
 }
 
+.room-card .btn {
+    margin-top: 1rem;
+}
+
 @media (max-width: 640px) {
     .search-grid {
         grid-template-columns: 1fr;

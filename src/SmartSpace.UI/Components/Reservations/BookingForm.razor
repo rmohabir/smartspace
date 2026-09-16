@@ -1,0 +1,151 @@
+@using SmartSpace.UI.Components.Reservations
+@inject BookingClient Booking
+
+<section class="search-panel booking-panel" aria-labelledby="booking-form-title">
+    <h2 id="booking-form-title">Reserveringsgegevens</h2>
+    <form @onsubmit="SubmitAsync" @onsubmit:preventDefault="true">
+        <div class="search-grid">
+            <div class="field-group">
+                <label for="booking-start">Begintijd</label>
+                <InputDate id="booking-start" class="form-control" @bind-Value="startLocal" Type="InputDateType.DateTimeLocal" />
+            </div>
+            <div class="field-group">
+                <label for="booking-end">Eindtijd</label>
+                <InputDate id="booking-end" class="form-control" @bind-Value="endLocal" Type="InputDateType.DateTimeLocal" />
+            </div>
+        </div>
+
+        @if (ambiguousStart || ambiguousEnd)
+        {
+            <div class="time-choice" role="group" aria-labelledby="booking-time-choice-title">
+                <h3 id="booking-time-choice-title">Kies de tijdzonekeuze</h3>
+                <p>Dit tijdstip komt twee keer voor. Kies expliciet welke tijd je bedoelt.</p>
+                @if (ambiguousStart)
+                {
+                    <label for="booking-start-offset">Begintijd-offset</label>
+                    <select id="booking-start-offset" class="form-select" @bind="startOffsetMinutes">
+                        <option value="">Kies een offset</option>
+                        <option value="120">UTC+02:00</option>
+                        <option value="60">UTC+01:00</option>
+                    </select>
+                }
+                @if (ambiguousEnd)
+                {
+                    <label for="booking-end-offset">Eindtijd-offset</label>
+                    <select id="booking-end-offset" class="form-select" @bind="endOffsetMinutes">
+                        <option value="">Kies een offset</option>
+                        <option value="120">UTC+02:00</option>
+                        <option value="60">UTC+01:00</option>
+                    </select>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        }
+        @if (!string.IsNullOrWhiteSpace(successMessage))
+        {
+            <div class="alert alert-success" role="status">@successMessage</div>
+        }
+
+        <button class="btn btn-primary" type="submit" disabled="@isSubmitting">
+            @(isSubmitting ? "Reserveren..." : "Reservering bevestigen")
+        </button>
+        <a class="btn btn-link" href="beschikbaarheid">Terug naar beschikbaarheid</a>
+    </form>
+</section>
+
+@code {
+    [Parameter]
+    public Guid ResourceId { get; set; }
+
+    private DateTime startLocal = DateTime.Now.AddHours(1);
+    private DateTime endLocal = DateTime.Now.AddHours(2);
+    private readonly TimeZoneInfo amsterdamTimeZone = GetAmsterdamTimeZone();
+    private int? startOffsetMinutes;
+    private int? endOffsetMinutes;
+    private bool isSubmitting;
+    private string? errorMessage;
+    private string? successMessage;
+
+    private bool ambiguousStart => amsterdamTimeZone.IsAmbiguousTime(startLocal);
+    private bool ambiguousEnd => amsterdamTimeZone.IsAmbiguousTime(endLocal);
+
+    private async Task SubmitAsync()
+    {
+        errorMessage = null;
+        successMessage = null;
+
+        if (endLocal <= startLocal)
+        {
+            errorMessage = "De eindtijd moet na de begintijd liggen.";
+            return;
+        }
+
+        if (startLocal <= DateTime.Now)
+        {
+            errorMessage = "Een reservering moet in de toekomst beginnen.";
+            return;
+        }
+
+        if (amsterdamTimeZone.IsInvalidTime(startLocal) || amsterdamTimeZone.IsInvalidTime(endLocal))
+        {
+            errorMessage = "Een gekozen tijd bestaat niet door de overgang naar zomertijd.";
+            return;
+        }
+
+        if ((ambiguousStart && !startOffsetMinutes.HasValue) || (ambiguousEnd && !endOffsetMinutes.HasValue))
+        {
+            errorMessage = "Kies een offset voor elk dubbel voorkomend tijdstip.";
+            return;
+        }
+
+        isSubmitting = true;
+        try
+        {
+            var result = await Booking.CreateAsync(
+                ResourceId,
+                ToOffset(startLocal, startOffsetMinutes),
+                ToOffset(endLocal, endOffsetMinutes));
+            successMessage = $"{result.ResourceName} is gereserveerd van {result.Start:dd-MM-yyyy HH:mm} tot {result.End:HH:mm}.";
+        }
+        catch (BookingException exception) when ((int)exception.StatusCode == 409)
+        {
+            errorMessage = "Deze ruimte is inmiddels niet meer beschikbaar. Ga terug en laad de beschikbaarheid opnieuw.";
+        }
+        catch (BookingException exception) when ((int)exception.StatusCode == 400)
+        {
+            errorMessage = exception.Message;
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "De reservering kon niet worden opgeslagen. Probeer het opnieuw.";
+        }
+        finally
+        {
+            isSubmitting = false;
+        }
+    }
+
+    private DateTimeOffset ToOffset(DateTime local, int? selectedOffsetMinutes)
+    {
+        var offset = selectedOffsetMinutes.HasValue
+            ? TimeSpan.FromMinutes(selectedOffsetMinutes.Value)
+            : amsterdamTimeZone.GetUtcOffset(local);
+        return new DateTimeOffset(DateTime.SpecifyKind(local, DateTimeKind.Unspecified), offset);
+    }
+
+    private static TimeZoneInfo GetAmsterdamTimeZone()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Europe/Amsterdam");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+        }
+    }
+}

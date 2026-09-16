@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using SmartSpace.Api;
 using SmartSpace.Api.Data;
+using SmartSpace.Api.Features.Reservations;
 using SmartSpace.Api.Features.Rooms;
 using SmartSpace.Api.Infrastructure;
 using SmartSpace.Api.Security;
@@ -41,6 +42,7 @@ builder.Services.AddAuthorization(options =>
 	options.AddPolicy(AuthorizationPolicies.Administrator, policy =>
 		policy.RequireRole("Administrator")));
 builder.Services.AddScoped<RoomAvailabilityService>();
+builder.Services.AddScoped<ReservationService>();
 
 var app = builder.Build();
 
@@ -68,5 +70,6 @@ app.MapGet("/", () => Results.Ok(new
 }));
 
 app.MapRoomsEndpoints();
+app.MapReservationEndpoints();
 
 app.Run();
