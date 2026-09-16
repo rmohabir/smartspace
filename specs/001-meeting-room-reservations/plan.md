@@ -43,8 +43,8 @@ opleveren
 benadert de API rechtstreeks; geen secrets in broncode of logs; Europe/Amsterdam
 voor invoer en weergave; niet-bestaande lokale tijden worden geweigerd en dubbele
 lokale tijden vragen een expliciete keuze; geen hard delete van reserveringen of
-gerefereerde ruimtes; historische room-snapshot versus actuele roomgegevens is nog
-een open productbesluit
+gerefereerde ruimtes; historische ruimtegegevens worden als booking-time snapshot
+bewaard en eigenaarshistorie blijft onbeperkt raadpleegbaar.
 
 **Scale/Scope**: Release 1 voor BIDN-vergaderruimtes, medewerkers en beheerders;
 geen werkplekken als gebruikersfunctie, herhaalboekingen, notificaties,
@@ -67,9 +67,9 @@ deelnemerslijsten, check-in/check-out of externe integraties
 | Toegankelijke UI | PASS | Keyboard, labels, focus, responsive states en begrijpelijke foutmeldingen zijn gates. |
 | Voorstelstatus expliciet | PASS | Alle nieuwe architectuurkeuzes staan in `docs/decisions` met status Voorgesteld. |
 
-**Gate-uitkomst vóór research**: PASS voor stackconsistentie. Open productbesluiten
-blijven afzonderlijke pre-implementation gates; deze planning keurt geen product- of
-architectuurbesluit buiten de constitution goed.
+**Gate-uitkomst vóór research**: PASS voor stackconsistentie. Resterende open
+productbesluiten blijven afzonderlijke pre-implementation gates; deze planning keurt
+geen product- of architectuurbesluit buiten de constitution goed.
 
 ## Project Structure
 

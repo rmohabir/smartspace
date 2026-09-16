@@ -100,7 +100,7 @@ and proposed repeated-cancel behavior.
 - [ ] T028 [US3] Add own-reservation GET endpoints in `src/SmartSpace.Api/Features/Reservations/ReservationEndpoints.cs`; Depends: T027, T008; Done when query/filter contracts, 401/404 privacy behavior, and typed-client expectations match OpenAPI.
 - [ ] T029 [US3] Implement owner-scoped update with version and original-state preservation in `src/SmartSpace.Api/Features/Reservations/ReservationService.cs`; Depends: T022, T012; Done when only own future active reservations can change, overlap/invalid/DST/stale failures leave the original intact, and successful updates replace the version (FR-008, FR-009).
 - [ ] T030 [US3] Implement owner-scoped cancellation and proposed idempotent repeat behavior in `src/SmartSpace.Api/Features/Reservations/ReservationService.cs`; Depends: T022, T029; Done when first cancellation preserves history/releases the interval, unauthorized cancellation is denied, and repeated cancellation follows the explicitly labeled lab proposal without hard delete (FR-010, FR-011, FR-019).
-- [ ] T031 [US3] Add PUT/cancel API integration tests in `tests/SmartSpace.IntegrationTests/Reservations/UpdateCancelReservationTests.cs`; Depends: T028-T030, T012; Done when all AC-US3 scenarios, failed-update preservation, stale version, unauthorized access, history, and repeat-cancel proposal are represented.
+- [ ] T031 [US3] Add PUT/cancel API integration tests in `tests/SmartSpace.IntegrationTests/Reservations/UpdateCancelReservationTests.cs`; Depends: T028-T030, T012; Done when all AC-US3 scenarios, failed-update preservation, stale version, unauthorized access, history snapshot fields, unlimited owner history, administrator management rights, and repeat-cancel proposal are represented.
 - [ ] T032 [P] [US3] Build the own-reservations pages and accessible status/action components in `src/SmartSpace.UI/Pages/MyReservations.razor` and `src/SmartSpace.UI/Components/Reservations/`; Depends: T028-T030; Done when tabs, mobile cards, status text, edit/cancel visibility, confirmation, loading/empty/error states, and typed client fetching are specified.
 - [ ] T033 [US3] Add browser coverage for own reservations and history in `tests/SmartSpace.IntegrationTests/Browser/own-reservations.spec.ts`; Depends: T031, T032; Done when upcoming/past/cancelled, update success/failure, cancel, other-owner denial, keyboard operation, and responsive layouts map to AC-US3.1-US3.5.
 
@@ -131,7 +131,7 @@ preservation.
 
 | Requirement group | Acceptance criteria | Primary tasks | Test artifacts |
 |---|---|---|---|
-| FR-001-FR-002, FR-011, FR-015, FR-017-FR-018 | AC-US1.1-US1.4 | T017-T021 | `AvailabilityEndpointTests.cs`, `availability.spec.ts`, T013 |
+| FR-001-FR-002, FR-011, FR-015, FR-015a, FR-017-FR-018 | AC-US1.1-US1.4, AC-US4.3 | T017-T021, T034-T038 | `AvailabilityEndpointTests.cs`, `AdminRoomTests.cs`, `availability.spec.ts`, T013 |
 | FR-003-FR-007 | AC-US2.1-US2.4 | T009-T016, T022-T026 | `BookingIntervalRulesTests.cs`, `ConcurrentReservationTests.cs`, `CreateReservationTests.cs`, `booking.spec.ts` |
 | FR-008-FR-013, FR-019 | AC-US3.1-US3.5 | T012, T027-T033 | `FailedUpdatePreservesOriginalTests.cs`, `UpdateCancelReservationTests.cs`, `own-reservations.spec.ts` |
 | FR-014-FR-016 | AC-US4.1-US4.6 | T010, T014, T034-T038 | `AuthorizationRulesTests.cs`, `AdminRoomTests.cs`, `admin-rooms.spec.ts` |
