@@ -12,7 +12,7 @@
 
 <section class="search-panel" aria-labelledby="search-title">
     <h2 id="search-title">Zoek een ruimte</h2>
-    <EditForm OnValidSubmit="SearchAsync">
+    <form @onsubmit="SearchAsync" @onsubmit:preventDefault="true">
         <div class="search-grid">
             <div class="field-group">
                 <label for="start">Begintijd</label>
@@ -72,7 +72,7 @@
         <button class="btn btn-primary" type="submit" disabled="@isLoading">
             @(isLoading ? "Zoeken..." : "Zoek beschikbare ruimtes")
         </button>
-    </EditForm>
+    </form>
 </section>
 
 @if (hasSearched && !isLoading && string.IsNullOrWhiteSpace(errorMessage) && rooms.Count == 0)
