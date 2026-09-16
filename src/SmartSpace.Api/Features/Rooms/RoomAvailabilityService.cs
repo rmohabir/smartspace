@@ -5,7 +5,7 @@ using SmartSpace.Api.Domain;
 namespace SmartSpace.Api.Features.Rooms;
 
 public sealed record RoomAvailabilityRequest(
-    Guid LocationId,
+    Guid? LocationId,
     DateTimeOffset Start,
     DateTimeOffset End,
     int MinimumCapacity);
@@ -43,7 +43,9 @@ public sealed class RoomAvailabilityService(SmartSpaceDbContext db)
             .AsNoTracking()
             .Include(resource => resource.Location)
             .Where(resource => resource.IsActive)
-            .Where(resource => resource.LocationId == request.LocationId)
+            .Where(resource => resource.Location != null && resource.Location.IsActive)
+            .Where(resource => request.LocationId == null || resource.LocationId == request.LocationId)
+            .Where(resource => resource.ResourceType == ResourceType.MeetingRoom)
             .Where(resource => resource.Capacity >= request.MinimumCapacity)
             .Where(resource => !overlappingResourceIds.Contains(resource.Id))
             .OrderBy(resource => resource.Name)

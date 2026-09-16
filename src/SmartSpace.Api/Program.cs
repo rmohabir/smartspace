@@ -46,6 +46,11 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+	using var scope = app.Services.CreateScope();
+	var db = scope.ServiceProvider.GetRequiredService<SmartSpaceDbContext>();
+	await db.Database.MigrateAsync();
+	await DevelopmentDataSeeder.SeedAsync(db);
+
 	app.MapOpenApi();
 	app.UseCors("Development");
 }

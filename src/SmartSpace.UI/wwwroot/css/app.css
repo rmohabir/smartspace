@@ -116,6 +116,81 @@ a, .btn-link {
     max-width: 720px;
 }
 
+.search-panel,
+.room-results {
+    background: #fff;
+    border: 1px solid #dce5e7;
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.search-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-bottom: 1rem;
+}
+
+.field-group {
+    display: grid;
+    gap: .4rem;
+}
+
+.field-group label,
+.time-choice label {
+    font-weight: 700;
+}
+
+.time-choice {
+    background: #fff8e6;
+    border-left: .35rem solid #e2a93b;
+    display: grid;
+    gap: .5rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.time-choice h3,
+.time-choice p {
+    margin: 0;
+}
+
+.results-heading {
+    align-items: end;
+    display: flex;
+    justify-content: space-between;
+}
+
+.results-heading h2 {
+    margin: 0;
+}
+
+.room-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 1rem;
+}
+
+.room-card {
+    border: 1px solid #dce5e7;
+    border-top: .35rem solid #176044;
+    border-radius: .75rem;
+    padding: 1.25rem;
+}
+
+.room-card h3,
+.room-card p {
+    margin-top: 0;
+}
+
+@media (max-width: 640px) {
+    .search-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 640px) {
     .status-panel {
         align-items: flex-start;

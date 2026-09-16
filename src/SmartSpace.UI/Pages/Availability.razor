@@ -1,15 +1,203 @@
 @page "/beschikbaarheid"
+@using SmartSpace.UI.Components.RoomSearch
+@inject RoomSearchClient RoomSearch
 
 <PageTitle>Beschikbaarheid | SmartSpace</PageTitle>
 
 <section class="page-heading" aria-labelledby="availability-title">
     <p class="eyebrow">Medewerker</p>
     <h1 id="availability-title">Beschikbaarheid</h1>
-    <p>Zoek straks een vergaderruimte op tijd, locatie en capaciteit.</p>
+    <p>Vind een passende ruimte voor het exacte tijdvak van je overleg.</p>
 </section>
 
-<section class="empty-state" aria-labelledby="availability-status">
-    <span class="status-badge">Volgende bouwfase</span>
-    <h2 id="availability-status">Zoeken en boeken worden hier toegevoegd</h2>
-    <p>De applicatieshell staat klaar. De beschikbaarheidsflow volgt in de user-storyfase.</p>
+<section class="search-panel" aria-labelledby="search-title">
+    <h2 id="search-title">Zoek een ruimte</h2>
+    <EditForm OnValidSubmit="SearchAsync">
+        <div class="search-grid">
+            <div class="field-group">
+                <label for="start">Begintijd</label>
+                <InputDate id="start" class="form-control" @bind-Value="startLocal" Type="InputDateType.DateTimeLocal" />
+            </div>
+            <div class="field-group">
+                <label for="end">Eindtijd</label>
+                <InputDate id="end" class="form-control" @bind-Value="endLocal" Type="InputDateType.DateTimeLocal" />
+            </div>
+            <div class="field-group">
+                <label for="location">Locatie</label>
+                <select id="location" class="form-select" @bind="selectedLocationId">
+                    <option value="">Alle actieve locaties</option>
+                    @foreach (var location in locations)
+                    {
+                        <option value="@location.Id">@location.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="field-group">
+                <label for="capacity">Minimumcapaciteit</label>
+                <InputNumber id="capacity" class="form-control" @bind-Value="minimumCapacity" min="1" />
+            </div>
+        </div>
+
+        @if (ambiguousStart || ambiguousEnd)
+        {
+            <div class="time-choice" role="group" aria-labelledby="time-choice-title">
+                <h3 id="time-choice-title">Kies de zomertijdinterpretatie</h3>
+                <p>Dit tijdstip komt twee keer voor. Kies expliciet welke tijd je bedoelt.</p>
+                @if (ambiguousStart)
+                {
+                    <label for="start-offset">Begintijd-offset</label>
+                    <select id="start-offset" class="form-select" @bind="startOffsetMinutes">
+                        <option value="">Kies een offset</option>
+                        <option value="120">UTC+02:00</option>
+                        <option value="60">UTC+01:00</option>
+                    </select>
+                }
+                @if (ambiguousEnd)
+                {
+                    <label for="end-offset">Eindtijd-offset</label>
+                    <select id="end-offset" class="form-select" @bind="endOffsetMinutes">
+                        <option value="">Kies een offset</option>
+                        <option value="120">UTC+02:00</option>
+                        <option value="60">UTC+01:00</option>
+                    </select>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(errorMessage))
+        {
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        }
+
+        <button class="btn btn-primary" type="submit" disabled="@isLoading">
+            @(isLoading ? "Zoeken..." : "Zoek beschikbare ruimtes")
+        </button>
+    </EditForm>
 </section>
+
+@if (hasSearched && !isLoading && string.IsNullOrWhiteSpace(errorMessage) && rooms.Count == 0)
+{
+    <section class="empty-state" aria-live="polite" aria-labelledby="empty-title">
+        <span class="status-badge">Geen resultaat</span>
+        <h2 id="empty-title">Geen ruimte beschikbaar</h2>
+        <p>Probeer een ander tijdvak, een lagere capaciteit of een andere locatie.</p>
+    </section>
+}
+else if (rooms.Count > 0)
+{
+    <section class="room-results" aria-live="polite" aria-labelledby="results-title">
+        <div class="results-heading">
+            <div>
+                <p class="eyebrow">Beschikbaar</p>
+                <h2 id="results-title">@rooms.Count ruimte(s) gevonden</h2>
+            </div>
+        </div>
+        <div class="room-grid">
+            @foreach (var room in rooms)
+            {
+                <article class="room-card">
+                    <h3>@room.Name</h3>
+                    <p>Capaciteit: @room.Capacity personen</p>
+                    <span class="status-badge">Vrij voor jouw tijdvak</span>
+                </article>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    private readonly TimeZoneInfo amsterdamTimeZone = GetAmsterdamTimeZone();
+    private List<LocationOption> locations = [];
+    private List<RoomResult> rooms = [];
+    private DateTime startLocal = DateTime.Now.AddHours(1);
+    private DateTime endLocal = DateTime.Now.AddHours(2);
+    private Guid? selectedLocationId;
+    private int minimumCapacity = 1;
+    private int? startOffsetMinutes;
+    private int? endOffsetMinutes;
+    private bool isLoading;
+    private bool hasSearched;
+    private string? errorMessage;
+
+    private bool ambiguousStart => amsterdamTimeZone.IsAmbiguousTime(startLocal);
+    private bool ambiguousEnd => amsterdamTimeZone.IsAmbiguousTime(endLocal);
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            locations = (await RoomSearch.GetLocationsAsync()).ToList();
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Locaties konden niet worden geladen. Probeer het opnieuw.";
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        errorMessage = null;
+        rooms = [];
+        hasSearched = true;
+
+        if (endLocal <= startLocal)
+        {
+            errorMessage = "De eindtijd moet na de begintijd liggen.";
+            return;
+        }
+
+        if (amsterdamTimeZone.IsInvalidTime(startLocal) || amsterdamTimeZone.IsInvalidTime(endLocal))
+        {
+            errorMessage = "Een gekozen tijd bestaat niet door de overgang naar zomertijd.";
+            return;
+        }
+
+        if ((ambiguousStart && !startOffsetMinutes.HasValue) || (ambiguousEnd && !endOffsetMinutes.HasValue))
+        {
+            errorMessage = "Kies een offset voor elk dubbel voorkomend tijdstip.";
+            return;
+        }
+
+        if (minimumCapacity < 1)
+        {
+            errorMessage = "De minimumcapaciteit moet minimaal 1 zijn.";
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            var start = ToOffset(startLocal, startOffsetMinutes);
+            var end = ToOffset(endLocal, endOffsetMinutes);
+            rooms = (await RoomSearch.SearchAsync(start, end, selectedLocationId, minimumCapacity)).ToList();
+        }
+        catch (HttpRequestException)
+        {
+            errorMessage = "Beschikbaarheid kon niet worden geladen. Probeer het opnieuw.";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private DateTimeOffset ToOffset(DateTime local, int? selectedOffsetMinutes)
+    {
+        var offset = selectedOffsetMinutes.HasValue
+            ? TimeSpan.FromMinutes(selectedOffsetMinutes.Value)
+            : amsterdamTimeZone.GetUtcOffset(local);
+        return new DateTimeOffset(DateTime.SpecifyKind(local, DateTimeKind.Unspecified), offset);
+    }
+
+    private static TimeZoneInfo GetAmsterdamTimeZone()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Europe/Amsterdam");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
+        }
+    }
+}
