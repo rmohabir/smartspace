@@ -115,8 +115,8 @@ andere medewerker deze persoonlijke historie niet kan inzien.
 
 ### User Story 4 - Ruimtes beheren (Priority: P2)
 
-Als beheerder wil ik vergaderruimtes toevoegen, aanpassen en deactiveren, zodat de
-ruimtecatalogus betrouwbaar blijft.
+Als beheerder wil ik locaties en vergaderruimtes beheren, zodat de
+ruimtecatalogus betrouwbaar blijft zonder technische identifiers te hoeven kennen.
 
 **Why this priority**: Goed ruimtebeheer maakt beschikbaarheidsinformatie bruikbaar,
 maar is minder frequent dan het dagelijkse zoeken en boeken.
@@ -128,12 +128,13 @@ kan vinden.
 
 **Acceptance Scenarios**:
 
-1. **Given** een bevoegde beheerder voert een naam, positieve capaciteit en locatie
-   in, **When** de beheerder de ruimte opslaat, **Then** verschijnt de ruimte in de
-   catalogus en kan zij worden gevonden bij beschikbaarheid.
+1. **Given** een bevoegde beheerder kiest een bestaande locatie uit een lijst en
+  voert een naam en positieve capaciteit in, **When** de beheerder de ruimte opslaat,
+  **Then** verschijnt de ruimte in de catalogus en kan zij worden gevonden bij
+  beschikbaarheid.
 2. **Given** een beheerder probeert een ruimte ongeldig te wijzigen, **When** de
-   beheerder een lege naam, niet-positieve capaciteit of ontbrekende locatie indient,
-   **Then** wordt de wijziging afgewezen met veldgerichte uitleg.
+  beheerder een lege naam, niet-positieve capaciteit of geen locatie kiest, **Then**
+  wordt de wijziging afgewezen met veldgerichte uitleg.
 3. **Given** een ruimte heeft geen lopende of toekomstige actieve reserveringen,
    **When** de beheerder haar deactiveert, **Then** kan zij niet meer nieuw worden
    gereserveerd en blijft bestaande historie raadpleegbaar volgens de privacyregels.
@@ -147,6 +148,15 @@ kan vinden.
   beheren, **When** de beheerder de reservering opent, wijzigt of annuleert,
   **Then** wordt de actie toegestaan volgens dezelfde tijd-, overlap- en
   versiecontroles als voor een eigenaar.
+7. **Given** een bevoegde beheerder wil een nieuwe locatie gebruiken, **When** die
+  beheerder een naam en optionele gebouw- en verdiepinggegevens opslaat, **Then**
+  verschijnt de locatie direct in de locatielijst en in de room-keuzelijst.
+8. **Given** een bestaande locatie staat in de beheerlijst, **When** de beheerder
+  naam, gebouw of verdieping wijzigt, **Then** wordt de locatie bijgewerkt zonder
+  dat bestaande room- of reserveringsrelaties verdwijnen.
+9. **Given** de beheerder heeft een locatiekeuzelijst geopend, **When** de beheerder
+  een room toevoegt of wijzigt, **Then** ziet die beheerder leesbare locatienamen en
+  hoeft geen locatie-ID in te voeren.
 
 ### Edge Cases
 
@@ -164,6 +174,10 @@ kan vinden.
 - Een onbekende of niet-toegankelijke reservering geeft geen persoonsgegevens prijs.
 - Een beheerder mag een ruimte niet deactiveren door lopende of toekomstige
   reserveringen stilzwijgend te annuleren.
+- Een roomformulier toont actieve locaties als keuzelijst; locatie-ID's zijn geen
+  vrije gebruikersinvoer.
+- Een dubbele of lege locatienaam wordt geweigerd; locaties worden niet hard verwijderd
+  zolang rooms of historie ernaar verwijzen.
 - Foutmeldingen blijven begrijpelijk wanneer beschikbaarheid tijdelijk niet kan
   worden opgehaald of opgeslagen.
 
@@ -201,8 +215,11 @@ kan vinden.
   inzien. Een bevoegde beheerder mag reserveringen van anderen wel beheren volgens
   de vastgelegde beheerrechten.
 - **FR-014**: Het systeem MUST beheerders ruimtes laten toevoegen, naam, positieve
-  capaciteit en locatie laten aanpassen en ruimtes laten deactiveren wanneer geen
-  lopende of toekomstige actieve reservering bestaat.
+  capaciteit en een gekozen actieve locatie laten aanpassen en ruimtes laten
+  deactiveren wanneer geen lopende of toekomstige actieve reservering bestaat.
+- **FR-014a**: Het systeem MUST beheerders actieve locaties laten toevoegen en naam,
+  gebouw en verdieping laten wijzigen; de room-UI MUST deze locaties als leesbare
+  keuzelijst aanbieden en MUST geen locatie-ID als vrije tekst vragen.
 - **FR-015**: Het systeem MUST inactieve ruimtes uitsluiten van nieuwe
   beschikbaarheids- en boekingsresultaten, terwijl relevante historie behouden blijft.
 - **FR-015a**: Het systeem MUST beheerders toestaan een gedeactiveerde ruimte opnieuw
@@ -271,6 +288,8 @@ stilzwijgend goedgekeurd:
   en beheert.
 - **Beheerder**: bevoegde persoon die de vergaderruimtecatalogus onderhoudt; extra
   bevoegdheden voor reserveringen van anderen zijn niet vanzelfsprekend.
+- **Locatie**: beheerbare, benoemde plaats met optioneel gebouw en verdieping; een
+  locatie heeft versioning voor veilige wijzigingen en wordt niet hard verwijderd.
 - **Vergaderruimte**: boekbare ruimte met naam, positieve capaciteit, locatie en een
   actieve of inactieve status.
 - **Reservering**: tijdgebonden vastlegging van één vergaderruimte voor één eigenaar,

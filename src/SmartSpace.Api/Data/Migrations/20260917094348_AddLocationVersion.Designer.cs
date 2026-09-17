@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartSpace.Api.Data;
 
@@ -11,9 +12,11 @@ using SmartSpace.Api.Data;
 namespace SmartSpace.Api.Data.Migrations
 {
     [DbContext(typeof(SmartSpaceDbContext))]
-    partial class SmartSpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260917094348_AddLocationVersion")]
+    partial class AddLocationVersion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -7,12 +7,17 @@
 
 Annuleren moet historie behouden. Ruimtes kunnen later worden gedeactiveerd terwijl
 oude reserveringen naar die ruimte moeten blijven verwijzen.
+Locaties zijn beheerde catalogusgegevens; rooms moeten aan een leesbare locatie
+worden gekoppeld zonder dat een beheerder een GUID hoeft te kennen.
 
 ## Besluit
 
 Annuleren zet een reservering op `Cancelled` en verwijdert haar niet. Een gebruikte
 ruimte wordt gedeactiveerd in plaats van hard verwijderd. Deactiveren is verboden bij
 lopende of toekomstige actieve reserveringen en annuleert die niet stilzwijgend.
+Beheerders kunnen locaties toevoegen en wijzigen. Locaties worden niet hard verwijderd;
+roombeheer gebruikt een actieve-locatiekeuzelijst en locatie-updates behouden alle
+roomrelaties en reserveringssnapshots.
 
 ## Alternatieven
 

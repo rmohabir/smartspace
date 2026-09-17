@@ -7,8 +7,8 @@
 ## Summary
 
 SmartSpace release 1 ondersteunt het zoeken, boeken, wijzigen, annuleren en
-raadplegen van eigen reserveringen voor vergaderruimtes, plus ruimtebeheer door
-beheerders. De monorepo gebruikt .NET 10 C#, ASP.NET Core Minimal API, EF Core 10
+raadplegen van eigen reserveringen, plus beheer van locaties en vergaderruimtes
+door beheerders. De monorepo gebruikt .NET 10 C#, ASP.NET Core Minimal API, EF Core 10
 met SQL Server migrations en standalone Blazor WebAssembly.
 
 De reserveringsregels worden server-side en transactioneel afgedwongen. De Blazor-
@@ -35,7 +35,7 @@ webapp op `http://localhost:3000`
 geautomatiseerde testprojecten
 
 **Performance Goals**: Beschikbaarheids- en eigen-reserveringsqueries geven onder
-normale trainingsbelasting binnen 2 seconden een bruikbaar resultaat; 100 herhaalde
+ normale trainingsbelasting binnen 2 seconden een bruikbaar resultaat; 100 herhaalde
 concurrente aanvraagparen mogen nooit twee overlappende actieve reserveringen
 opleveren
 
@@ -148,7 +148,7 @@ en EF-entiteiten lekken niet naar de HTTP-contracten.
 1. **Unit tests**: tijdvakvalidatie, halfopen overlap, statusovergangen, ownership-
    beslissingen, DTO-validatie en ProblemDetails-mapping.
 2. **SQL Server integration tests**: migrations, foreign keys, persistence,
-  cancellation/history, idempotente herhaalde annulering,
+    cancellation/history, location and room administration, idempotente herhaalde annulering,
   deactivation guards en minimaal 100 paren gelijktijdige
    create requests met afzonderlijke API-processen of equivalent geïsoleerde
    processen. Assert responses én database-invariant.
@@ -167,6 +167,9 @@ en EF-entiteiten lekken niet naar de HTTP-contracten.
   persistence failures with bounded retry policy.
 - The BIDN Product Owner owns these decisions; they are recorded before the related
   story is implemented and reviewed at the release review on 2026-09-16.
+- Roombeheer gebruikt een leesbare locatiekeuzelijst; locatiebeheer gebeurt in
+  dezelfde beheercontext via aparte create/edit-acties. GUID's blijven API- en
+  versioning-details en zijn geen handmatige UI-invoer.
 
 ## Post-Design Constitution Re-check
 

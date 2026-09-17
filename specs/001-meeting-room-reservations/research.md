@@ -88,3 +88,17 @@ voor ownership, transactionele integriteit en database-invarianten.
 De keuzes in dit document zijn planinput, geen BIDN-goedkeuring. De stackafwijking
 van de constitution moet vóór implementatie worden bevestigd via de documenten in
 `docs/decisions/` en een constitutionele amendment indien nodig.
+
+## Location administration UX
+
+**Decision**: Roombeheer gebruikt een select met actieve locatienamen en optionele
+gebouwinformatie. Locatie toevoegen en wijzigen gebeurt in een aparte sectie op
+dezelfde adminpagina; locatie-ID's blijven uitsluitend API-identifiers.
+
+**Rationale**: Een beheerder denkt in herkenbare plaatsnamen, niet in GUID's. Een
+select voorkomt ongeldige relaties en maakt nieuwe locaties onmiddellijk bruikbaar
+voor rooms.
+
+**Alternatives considered**: Vrije GUID-invoer is afgewezen als foutgevoelig en
+ontoegankelijk. Een losse locatiepagina zonder terugkoppeling naar roombeheer is
+uitgesteld omdat de beheerder de nieuwe locatie direct bij roombewerking nodig heeft.

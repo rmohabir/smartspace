@@ -4,6 +4,7 @@ using SmartSpace.Api;
 using SmartSpace.Api.Data;
 using SmartSpace.Api.Features.Reservations;
 using SmartSpace.Api.Features.Rooms;
+using SmartSpace.Api.Features.Administration;
 using SmartSpace.Api.Infrastructure;
 using SmartSpace.Api.Security;
 
@@ -44,6 +45,8 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddScoped<RoomAvailabilityService>();
 builder.Services.AddScoped<ReservationService>();
 builder.Services.AddScoped<OwnReservationQueryService>();
+builder.Services.AddScoped<AdminRoomService>();
+builder.Services.AddScoped<AdminLocationService>();
 
 var app = builder.Build();
 
@@ -72,5 +75,7 @@ app.MapGet("/", () => Results.Ok(new
 
 app.MapRoomsEndpoints();
 app.MapReservationEndpoints();
+app.MapAdminRoomEndpoints();
+app.MapAdminLocationEndpoints();
 
 app.Run();

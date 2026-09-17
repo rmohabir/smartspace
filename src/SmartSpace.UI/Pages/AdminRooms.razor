@@ -1,15 +1,241 @@
 @page "/beheer/ruimtes"
+@using SmartSpace.UI.Components.Admin
+@inject AdminRoomClient Rooms
+@inject AdminLocationClient Locations
+@inject IJSRuntime Js
 
 <PageTitle>Ruimtes beheren | SmartSpace</PageTitle>
 
 <section class="page-heading" aria-labelledby="admin-title">
     <p class="eyebrow">Beheer</p>
     <h1 id="admin-title">Ruimtes beheren</h1>
-    <p>Beheer straks naam, capaciteit, locatie en actieve status van vergaderruimtes.</p>
+    <p>Beheer naam, capaciteit, locatie en actieve status van vergaderruimtes.</p>
 </section>
 
-<section class="empty-state" aria-labelledby="admin-status">
-    <span class="status-badge">Volgende bouwfase</span>
-    <h2 id="admin-status">Ruimtebeheer wordt hier toegevoegd</h2>
-    <p>De beheerflow volgt na de medewerkerstromen en de autorisatietests.</p>
+<section class="search-panel" aria-labelledby="room-form-title">
+    <h2 id="room-form-title">@(editingId.HasValue ? "Ruimte wijzigen" : "Ruimte toevoegen")</h2>
+    <div class="search-grid">
+        <label class="field-group">Naam<input class="form-control" @bind="name" /></label>
+        <label class="field-group">Capaciteit<input class="form-control" type="number" min="1" @bind="capacity" /></label>
+        <label class="field-group">
+            Locatie
+            <select class="form-select" @bind="selectedLocationIdText">
+                <option value="">Kies een locatie</option>
+                @foreach (var location in locations.Where(item => item.IsActive))
+                {
+                    <option value="@location.Id">@location.Name@(string.IsNullOrWhiteSpace(location.Building) ? "" : $" · gebouw {location.Building}")</option>
+                }
+            </select>
+        </label>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(formError))
+    {
+        <div class="alert alert-danger" role="alert">@formError</div>
+    }
+    <button class="btn btn-primary" disabled="@isSaving" @onclick="SaveAsync">@(isSaving ? "Opslaan..." : "Opslaan")</button>
+    @if (editingId.HasValue)
+    {
+        <button class="btn btn-link" @onclick="ResetForm">Nieuwe ruimte</button>
+    }
 </section>
+
+@if (isLoading)
+{
+    <section class="status-panel" aria-live="polite"><p>Ruimtes laden...</p></section>
+}
+else if (!string.IsNullOrWhiteSpace(loadError))
+{
+    <section class="status-panel" role="alert"><p>@loadError</p><button class="btn btn-primary" @onclick="LoadAsync">Opnieuw proberen</button></section>
+}
+else
+{
+    <section class="admin-room-list" aria-labelledby="room-list-title">
+        <div class="results-heading"><h2 id="room-list-title">Ruimtes</h2><span>@rooms.Count totaal</span></div>
+        @foreach (var room in rooms)
+        {
+            <article class="admin-room-row">
+                <div>
+                    <h3>@room.Name</h3>
+                    <p>@room.LocationName · @room.Capacity personen</p>
+                    <span class="status-badge">@(room.IsActive ? "Actief" : "Inactief")</span>
+                </div>
+                <div class="reservation-actions">
+                    <button class="btn btn-primary" @onclick="() => BeginEdit(room)">Wijzigen</button>
+                    <button class="btn btn-link" @onclick="() => ToggleActiveAsync(room)">@(room.IsActive ? "Deactiveren" : "Reactiveren")</button>
+                </div>
+            </article>
+        }
+    </section>
+}
+
+<section class="search-panel" aria-labelledby="location-form-title">
+    <h2 id="location-form-title">@(editingLocationId.HasValue ? "Locatie wijzigen" : "Locatie toevoegen")</h2>
+    <div class="search-grid">
+        <label class="field-group">Naam<input class="form-control" @bind="locationName" /></label>
+        <label class="field-group">Gebouw <span class="optional-label">optioneel</span><input class="form-control" @bind="locationBuilding" /></label>
+        <label class="field-group">Verdieping <span class="optional-label">optioneel</span><input class="form-control" @bind="locationFloor" /></label>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(locationError))
+    {
+        <div class="alert alert-danger" role="alert">@locationError</div>
+    }
+    <button class="btn btn-primary" disabled="@isSavingLocation" @onclick="SaveLocationAsync">@(isSavingLocation ? "Opslaan..." : "Locatie opslaan")</button>
+    @if (editingLocationId.HasValue)
+    {
+        <button class="btn btn-link" @onclick="ResetLocationForm">Nieuwe locatie</button>
+    }
+</section>
+
+<section class="admin-location-list" aria-labelledby="location-list-title">
+    <div class="results-heading"><h2 id="location-list-title">Locaties</h2><span>@locations.Count totaal</span></div>
+    @foreach (var location in locations)
+    {
+        <article class="admin-location-row">
+            <div><h3>@location.Name</h3><p>@location.Building · @location.Floor</p></div>
+            <button class="btn btn-link" @onclick="() => BeginLocationEdit(location)">Wijzigen</button>
+        </article>
+    }
+</section>
+
+@code {
+    private List<AdminRoom> rooms = [];
+    private List<AdminLocation> locations = [];
+    private Guid? editingId;
+    private Guid editingVersion;
+    private string name = string.Empty;
+    private int capacity = 1;
+    private string selectedLocationIdText = string.Empty;
+    private string? formError;
+    private string? loadError;
+    private bool isLoading;
+    private bool isSaving;
+    private Guid? editingLocationId;
+    private Guid editingLocationVersion;
+    private string locationName = string.Empty;
+    private string? locationBuilding;
+    private string? locationFloor;
+    private string? locationError;
+    private bool isSavingLocation;
+
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        loadError = null;
+        try
+        {
+            rooms = (await Rooms.ListAsync()).ToList();
+            locations = (await Locations.ListAsync()).ToList();
+        }
+        catch (AdminRoomException exception) { loadError = exception.Message; }
+        catch (HttpRequestException) { loadError = "Ruimtes konden niet worden geladen. Probeer het opnieuw."; }
+        finally { isLoading = false; }
+    }
+
+    private void BeginEdit(AdminRoom room)
+    {
+        editingId = room.Id;
+        editingVersion = room.Version;
+        name = room.Name;
+        capacity = room.Capacity;
+        selectedLocationIdText = room.LocationId.ToString();
+        formError = null;
+    }
+
+    private void ResetForm()
+    {
+        editingId = null;
+        editingVersion = Guid.Empty;
+        name = string.Empty;
+        capacity = 1;
+        selectedLocationIdText = string.Empty;
+        formError = null;
+    }
+
+    private async Task SaveAsync()
+    {
+        formError = null;
+        if (!Guid.TryParse(selectedLocationIdText, out var locationId) || string.IsNullOrWhiteSpace(name) || capacity < 1)
+        {
+            formError = "Vul een naam, positieve capaciteit en kies een locatie.";
+            return;
+        }
+
+        isSaving = true;
+        try
+        {
+            if (editingId.HasValue)
+            {
+                await Rooms.UpdateAsync(editingId.Value, new AdminRoomWriteRequest(name, capacity, locationId, editingVersion));
+            }
+            else
+            {
+                await Rooms.CreateAsync(new AdminRoomWriteRequest(name, capacity, locationId));
+            }
+            ResetForm();
+            await LoadAsync();
+        }
+        catch (AdminRoomException exception) { formError = exception.Message; }
+        finally { isSaving = false; }
+    }
+
+    private async Task ToggleActiveAsync(AdminRoom room)
+    {
+        if (room.IsActive && !await Js.InvokeAsync<bool>("confirm", "Deze ruimte deactiveren?")) return;
+        try
+        {
+            await Rooms.SetActiveAsync(room.Id, room.Version, !room.IsActive);
+            await LoadAsync();
+        }
+        catch (AdminRoomException exception) { loadError = exception.Message; }
+    }
+
+    private void BeginLocationEdit(AdminLocation location)
+    {
+        editingLocationId = location.Id;
+        editingLocationVersion = location.Version;
+        locationName = location.Name;
+        locationBuilding = location.Building;
+        locationFloor = location.Floor;
+        locationError = null;
+    }
+
+    private void ResetLocationForm()
+    {
+        editingLocationId = null;
+        editingLocationVersion = Guid.Empty;
+        locationName = string.Empty;
+        locationBuilding = null;
+        locationFloor = null;
+        locationError = null;
+    }
+
+    private async Task SaveLocationAsync()
+    {
+        locationError = null;
+        if (string.IsNullOrWhiteSpace(locationName))
+        {
+            locationError = "Vul een naam voor de locatie in.";
+            return;
+        }
+
+        isSavingLocation = true;
+        try
+        {
+            var request = new AdminLocationWriteRequest(locationName, locationBuilding, locationFloor, editingLocationId.HasValue ? editingLocationVersion : null);
+            if (editingLocationId.HasValue)
+            {
+                await Locations.UpdateAsync(editingLocationId.Value, request);
+            }
+            else
+            {
+                await Locations.CreateAsync(request);
+            }
+            ResetLocationForm();
+            await LoadAsync();
+        }
+        catch (AdminLocationException exception) { locationError = exception.Message; }
+        finally { isSavingLocation = false; }
+    }
+}

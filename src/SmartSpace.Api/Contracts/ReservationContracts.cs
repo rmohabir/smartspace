@@ -15,3 +15,7 @@ public sealed record RoomCreateRequest(string Name, int Capacity, Guid LocationI
 public sealed record RoomUpdateRequest(string Name, int Capacity, Guid LocationId, Guid Version);
 
 public sealed record VersionRequest(Guid Version);
+
+public sealed record LocationCreateRequest(string Name, string? Building, string? Floor);
+
+public sealed record LocationUpdateRequest(string Name, string? Building, string? Floor, Guid Version);

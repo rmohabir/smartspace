@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using SmartSpace.UI;
 using SmartSpace.UI.Components.RoomSearch;
 using SmartSpace.UI.Components.Reservations;
+using SmartSpace.UI.Components.Admin;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -12,5 +13,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://
 builder.Services.AddScoped<RoomSearchClient>();
 builder.Services.AddScoped<BookingClient>();
 builder.Services.AddScoped<MyReservationsClient>();
+builder.Services.AddScoped<AdminRoomClient>();
+builder.Services.AddScoped<AdminLocationClient>();
 
 await builder.Build().RunAsync();

@@ -348,3 +348,59 @@ code {
         flex-direction: column;
     }
 }
+
+.admin-room-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.admin-room-row {
+    align-items: center;
+    background: white;
+    border: 1px solid #dce5e7;
+    border-left: .35rem solid #176044;
+    border-radius: .75rem;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+    padding: 1.25rem;
+}
+
+.admin-room-row h3,
+.admin-room-row p {
+    margin-top: 0;
+}
+
+.admin-location-list {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-location-row {
+    align-items: center;
+    background: white;
+    border: 1px solid #dce5e7;
+    border-radius: .75rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+}
+
+.admin-location-row h3,
+.admin-location-row p {
+    margin: 0;
+}
+
+.optional-label {
+    color: #5f6b70;
+    font-size: .85rem;
+    font-weight: 400;
+}
+
+@media (max-width: 640px) {
+    .admin-room-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

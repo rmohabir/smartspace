@@ -60,11 +60,16 @@ code or secrets.
 
 ### Room administration
 
-- Create and update a room with valid values.
-- Reject empty name, non-positive capacity and missing location.
+- Create a location with a name and optional building/floor; verify it appears in
+  the room location select.
+- Edit a location and verify its rooms remain linked.
+- Create and update a room by selecting a readable location name; no location ID
+  should be typed manually.
+- Reject empty room name, non-positive capacity and no selected location.
 - Deactivate a room without current/future active reservations.
 - Reject deactivation when such reservations exist; do not cancel them implicitly.
 - Attempt administration as a regular employee and assert denial.
+- Attempt location create/update as a regular employee and assert denial.
 
 ### Time and accessibility
 

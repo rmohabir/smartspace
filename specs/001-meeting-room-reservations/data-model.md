@@ -15,8 +15,11 @@ Representeert een locatie waar vergaderruimtes staan.
 - `building`: optioneel aanvullend label.
 - `floor`: optioneel aanvullend label.
 - `isActive`: bepaalt of de locatie beschikbaar is voor nieuwe boekingen.
+- `version`: waarde voor stale-edit detectie bij locatiebeheer.
 
-Een locatie wordt niet verwijderd zolang eraan gerelateerde ruimtes of historie
+Een locatie wordt niet hard verwijderd zolang eraan gerelateerde ruimtes of historie
+bestaat. Beheerders kunnen locaties toevoegen en naam, gebouw en verdieping wijzigen.
+De room-beheerpagina toont actieve locaties als leesbare keuzelijst.
 bestaat. Zelfstandig locatiebeheer is niet een release-1 gebruikersflow tenzij een
 later besluit dat toevoegt.
 
@@ -98,6 +101,10 @@ afgewezen wijziging laat de oorspronkelijke waarden en status intact.
 - Een beheerder mag in release 1 reserveringen van anderen beheren volgens de
   bevestigde autorisatie- en privacyregels.
 - Alleen actieve ruimtes op actieve locaties verschijnen in nieuwe boekingsresultaten.
+- Room create/update accepteert alleen een gekozen actieve locatie; de UI laat geen
+  locatie-ID als vrije tekst toe.
+- Locatienaam is uniek; een lege of dubbele naam wordt afgewezen. Locatiewijzigingen
+  veranderen geen bestaande room-relaties of historische reserveringssnapshots.
 - Een reservering blokkeert deactivering als `start <= now < end`; op het exclusieve
   eindtijdstip is zij niet meer lopend.
 - Actieve overlappende reserveringen voor dezelfde ruimte zijn verboden.

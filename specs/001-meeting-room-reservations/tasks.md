@@ -21,8 +21,8 @@ T001-T004 Setup
     -> US1 Availability
       -> US2 Booking
         -> US3 Own reservations/history
-          -> US4 Room administration
-            -> T038-T042 Polish and release evidence
+          -> US4 Room and location administration
+            -> T043-T047 Polish and release evidence
 ```
 
 US1 can begin after Foundation. US2 depends on the overlap, SQL Server concurrency,
@@ -113,19 +113,24 @@ under the confirmed release-1 policy.
 validation errors, blocked deactivation, unauthorized employee access, and history
 preservation.
 
-- [ ] T034 [US4] Implement room administration service in `src/SmartSpace.Api/Features/Administration/AdminRoomService.cs`; Depends: T005-T008, T014, T022; Done when positive capacity/location/name validation, admin role checks, version checks, deactivation guard, no implicit cancellation, and no hard delete are enforced (FR-014-FR-016; AC-US4.1-US4.6).
-- [ ] T035 [US4] Add administration Minimal API endpoints in `src/SmartSpace.Api/Features/Administration/AdminRoomEndpoints.cs`; Depends: T034, T015, T008; Done when create/update/deactivate/reactivate DTOs match OpenAPI, create has no version requirement, updates have version requirements, and 403/409 ProblemDetails are stable.
-- [ ] T036 [US4] Add room administration integration tests in `tests/SmartSpace.IntegrationTests/Administration/AdminRoomTests.cs`; Depends: T035, T016; Done when validation, active/inactive visibility, blocked deactivation, version conflicts, employee denial, and reservation-preserving lifecycle are asserted.
-- [ ] T037 [P] [US4] Build the admin rooms page and accessible form/table components in `src/SmartSpace.UI/Pages/AdminRooms.razor` and `src/SmartSpace.UI/Components/Admin/`; Depends: T035; Done when admin-only navigation, inline validation, blocked-deactivation explanation, loading/error states, and keyboard/responsive behavior are specified.
-- [ ] T038 [US4] Add browser coverage for room administration in `tests/SmartSpace.IntegrationTests/Browser/admin-rooms.spec.ts`; Depends: T036, T037; Done when valid admin flow, invalid input, blocked deactivation, employee denial, and responsive keyboard flow map to AC-US4.1-US4.6.
+- [X] T034 [US4] Implement room administration service in `src/SmartSpace.Api/Features/Administration/AdminRoomService.cs`; Depends: T005-T008, T014, T022; Done when positive capacity/location/name validation, admin role checks, version checks, deactivation guard, no implicit cancellation, and no hard delete are enforced (FR-014-FR-016; AC-US4.1-US4.6).
+- [X] T035 [US4] Add administration Minimal API endpoints in `src/SmartSpace.Api/Features/Administration/AdminRoomEndpoints.cs`; Depends: T034, T015, T008; Done when create/update/deactivate/reactivate DTOs match OpenAPI, create has no version requirement, updates have version requirements, and 403/409 ProblemDetails are stable.
+- [X] T036 [US4] Add room administration integration tests in `tests/SmartSpace.IntegrationTests/Administration/AdminRoomTests.cs`; Depends: T035, T016; Done when validation, active/inactive visibility, blocked deactivation, version conflicts, employee denial, and reservation-preserving lifecycle are asserted.
+- [X] T037 [P] [US4] Build the admin rooms page and accessible form/table components in `src/SmartSpace.UI/Pages/AdminRooms.razor` and `src/SmartSpace.UI/Components/Admin/`; Depends: T035; Done when admin-only navigation, inline validation, blocked-deactivation explanation, loading/error states, and keyboard/responsive behavior are specified.
+- [X] T038 [US4] Add browser coverage for room administration in `tests/SmartSpace.IntegrationTests/Browser/admin-rooms.spec.ts`; Depends: T036, T037; Done when valid admin flow, invalid input, blocked deactivation, employee denial, and responsive keyboard flow map to AC-US4.1-US4.6.
+
+- [X] T039 [US4] Implement versioned location administration in `src/SmartSpace.Api/Features/Administration/AdminLocationService.cs`; Depends: T034-T036; Done when administrators can list, create and update locations, duplicate/empty names and stale versions are rejected, and existing room relationships remain intact (FR-014a; AC-US4.7-US4.8).
+- [X] T040 [US4] Add protected location administration endpoints in `src/SmartSpace.Api/Features/Administration/AdminLocationEndpoints.cs` and update `specs/001-meeting-room-reservations/contracts/openapi.yaml`; Depends: T039; Done when admin list/create/update contracts, 400/403/404/409 responses and version fields are stable.
+- [X] T041 [US4] Replace room location-ID text input with a typed location select and add location create/edit UI in `src/SmartSpace.UI/Pages/AdminRooms.razor` and `src/SmartSpace.UI/Components/Admin/`; Depends: T040; Done when administrators see readable location names, can add/edit locations in the same workflow, and no GUID is manually entered.
+- [X] T042 [US4] Add location integration and browser coverage in `tests/SmartSpace.IntegrationTests/Administration/AdminLocationTests.cs` and `tests/SmartSpace.IntegrationTests/Browser/admin-rooms.spec.ts`; Depends: T039-T041; Done when location CRUD, duplicate/stale validation, room relationship preservation, employee denial, select behavior, keyboard flow and responsive layout are asserted.
 
 ## Phase 7: Polish and cross-cutting release evidence
 
-- [ ] T039 [P] Add cross-cutting accessibility and responsive requirements evidence templates in `tests/SmartSpace.IntegrationTests/Browser/accessibility.spec.ts` and `docs/validation/accessibility.md`; Depends: T020, T026, T033, T038; Done when keyboard, labels, focus, text alternatives, 375/768/1440px, 200% zoom, and no-overflow criteria are listed without claiming they passed.
-- [ ] T040 [P] Add API contract consistency review notes in `docs/validation/openapi-review.md`; Depends: T008, T018, T023, T028, T035; Done when every documented route has an owning feature, DTO, status-code mapping, and requirement/AC/test reference.
-- [ ] T041 Update `README.md` with local start, SQL Server prerequisite, exact URLs, CORS origin, migrations, test groups, and known open decisions; Depends: T001-T004, T039-T040; Done when commands are documented without secrets and the training prototype is not described as production acceptance.
-- [ ] T042 Resolve or explicitly gate open product decisions in `specs/001-meeting-room-reservations/spec.md`, `specs/001-meeting-room-reservations/plan.md`, and `docs/decisions/`; Depends: T027-T038; Done when all remaining open product decisions are either confirmed by BIDN or clearly blocking/deferred; retry/commit behavior, historical snapshots, retention/privacy, running-reservation boundary, and reactivation are already confirmed.
-- [ ] T043 Run the full traceability review in `docs/validation/traceability.md`; Depends: T040-T042; Done when every FR-001-FR-020 has at least one AC reference, implementation task, and named test artifact, with unresolved proposals listed separately.
+- [ ] T043 [P] Add cross-cutting accessibility and responsive requirements evidence templates in `tests/SmartSpace.IntegrationTests/Browser/accessibility.spec.ts` and `docs/validation/accessibility.md`; Depends: T020, T026, T033, T042; Done when keyboard, labels, focus, text alternatives, 375/768/1440px, 200% zoom, and no-overflow criteria are listed without claiming they passed.
+- [ ] T044 [P] Add API contract consistency review notes in `docs/validation/openapi-review.md`; Depends: T008, T018, T023, T028, T040; Done when every documented route has an owning feature, DTO, status-code mapping, and requirement/AC/test reference.
+- [ ] T045 Update `README.md` with local start, SQL Server prerequisite, exact URLs, CORS origin, migrations, test groups, and known open decisions; Depends: T001-T004, T043-T044; Done when commands are documented without secrets and the training prototype is not described as production acceptance.
+- [ ] T046 Resolve or explicitly gate open product decisions in `specs/001-meeting-room-reservations/spec.md`, `specs/001-meeting-room-reservations/plan.md`, and `docs/decisions/`; Depends: T027-T042; Done when all remaining open product decisions are either confirmed by BIDN or clearly blocking/deferred; retry/commit behavior, historical snapshots, retention/privacy, running-reservation boundary, and reactivation are already confirmed.
+- [ ] T047 Run the full traceability review in `docs/validation/traceability.md`; Depends: T040-T046; Done when every FR-001-FR020 has at least one AC reference, implementation task, and named test artifact, with unresolved proposals listed separately.
 
 ## Traceability matrix
 
@@ -134,7 +139,7 @@ preservation.
 | FR-001-FR-002, FR-011, FR-015, FR-015a, FR-017-FR-018 | AC-US1.1-US1.4, AC-US4.3 | T017-T021, T034-T038 | `AvailabilityEndpointTests.cs`, `AdminRoomTests.cs`, `availability.spec.ts`, T013 |
 | FR-003-FR-007 | AC-US2.1-US2.4 | T009-T016, T022-T026 | `BookingIntervalRulesTests.cs`, `ConcurrentReservationTests.cs`, `CreateReservationTests.cs`, `booking.spec.ts` |
 | FR-008-FR-013, FR-019 | AC-US3.1-US3.5 | T012, T027-T033 | `FailedUpdatePreservesOriginalTests.cs`, `UpdateCancelReservationTests.cs`, `own-reservations.spec.ts` |
-| FR-014-FR-016 | AC-US4.1-US4.6 | T010, T014, T034-T038 | `AuthorizationRulesTests.cs`, `AdminRoomTests.cs`, `admin-rooms.spec.ts` |
+| FR-014-FR-016, FR-014a | AC-US4.1-US4.9 | T010, T014, T034-T042 | `AuthorizationRulesTests.cs`, `AdminRoomTests.cs`, `AdminLocationTests.cs`, `admin-rooms.spec.ts` |
 | FR-020 | All ACs and traceability gate | T040-T043 | `openapi-review.md`, `traceability.md` |
 
 ## MVP and implementation strategy
