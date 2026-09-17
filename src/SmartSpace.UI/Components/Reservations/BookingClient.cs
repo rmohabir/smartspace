@@ -39,8 +39,14 @@ public sealed record BookingResult(
     Guid LocationId,
     DateTimeOffset Start,
     DateTimeOffset End,
-    string Status,
+    ReservationStatus Status,
     Guid Version);
+
+public enum ReservationStatus
+{
+    Active = 1,
+    Cancelled = 2
+}
 
 public sealed record ProblemResponse(string? Detail, string? Code);
 
