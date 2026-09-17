@@ -181,12 +181,8 @@ paths:
       responses:
         '200':
           description: Reservation cancelled by the first cancellation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Reservation'
-        '204':
-          description: Reservation was already cancelled; operation is idempotently successful
+          '204':
+            description: Reservation was cancelled
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { $ref: '#/components/responses/Conflict' }
   /api/admin/rooms:
@@ -302,17 +298,19 @@ components:
       required: true
       schema: { type: string, format: uuid }
     ReservationId:
-      name: id
-      in: path
+            resourceId: { type: string, format: uuid }
+            resourceName: { type: string }
       required: true
+            locationId: { type: string, format: uuid }
+            capacity: { type: integer, minimum: 1 }
       schema: { type: string, format: uuid }
   schemas:
-    Location:
+            status: { type: integer, enum: [1, 2], description: 1=Active, 2=Cancelled }
       type: object
       required: [id, name]
       properties:
-        id: { type: string, format: uuid }
-        name: { type: string }
+          properties:
+            resourceId: { type: string, format: uuid }
         building: { type: string, nullable: true }
         floor: { type: string, nullable: true }
     Room:
@@ -328,7 +326,7 @@ components:
         version: { type: string, format: uuid }
     Reservation:
       type: object
-      required: [id, roomId, roomName, locationName, start, end, status, version]
+      required: [id, resourceId, resourceName, locationName, locationId, capacity, start, end, status, version]
       properties:
         id: { type: string, format: uuid }
         roomId: { type: string, format: uuid }
@@ -340,7 +338,7 @@ components:
         version: { type: string, format: uuid }
     CreateReservationRequest:
       type: object
-      required: [roomId, start, end]
+      required: [resourceId, start, end]
       properties:
         roomId: { type: string, format: uuid }
         start: { type: string, format: date-time }

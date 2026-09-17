@@ -43,6 +43,7 @@ builder.Services.AddAuthorization(options =>
 		policy.RequireRole("Administrator")));
 builder.Services.AddScoped<RoomAvailabilityService>();
 builder.Services.AddScoped<ReservationService>();
+builder.Services.AddScoped<OwnReservationQueryService>();
 
 var app = builder.Build();
 

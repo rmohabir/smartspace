@@ -1,15 +1,140 @@
 @page "/mijn-reserveringen"
+@using SmartSpace.UI.Components.Reservations
+@inject MyReservationsClient Reservations
+@inject IJSRuntime Js
 
 <PageTitle>Mijn reserveringen | SmartSpace</PageTitle>
 
 <section class="page-heading" aria-labelledby="reservations-title">
     <p class="eyebrow">Mijn werk</p>
     <h1 id="reservations-title">Mijn reserveringen</h1>
-    <p>Komende, afgelopen en geannuleerde reserveringen komen hier samen.</p>
+    <p>Beheer je komende afspraken en bekijk je reserveringshistorie.</p>
 </section>
 
-<section class="empty-state" aria-labelledby="reservations-status">
-    <span class="status-badge">Volgende bouwfase</span>
-    <h2 id="reservations-status">Je reserveringen verschijnen hier</h2>
-    <p>De persoonlijke reserveringsflow wordt aangesloten zodra de boekingsregels actief zijn.</p>
-</section>
+<nav class="reservation-tabs" aria-label="Reserveringsweergave">
+    @foreach (var tab in tabs)
+    {
+        <button class="@(activeView == tab.Key ? "active" : "")" type="button" @onclick="() => LoadAsync(tab.Key)">@tab.Label</button>
+    }
+</nav>
+
+@if (isLoading)
+{
+    <section class="status-panel" aria-live="polite"><p>Reserveringen laden...</p></section>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <section class="status-panel" role="alert"><p>@errorMessage</p><button class="btn btn-primary" @onclick="() => LoadAsync(activeView)">Opnieuw proberen</button></section>
+}
+else if (reservations.Count == 0)
+{
+    <section class="empty-state" aria-live="polite">
+        <span class="status-badge">Geen resultaten</span>
+        <h2>Geen reserveringen gevonden</h2>
+        <p>In deze weergave staan nog geen reserveringen.</p>
+        <a class="btn btn-primary" href="beschikbaarheid">Ruimte zoeken</a>
+    </section>
+}
+else
+{
+    <section class="reservation-list" aria-label="Reserveringen">
+        @foreach (var reservation in reservations)
+        {
+            <article class="reservation-card">
+                <div>
+                    <p class="eyebrow">@StatusText(reservation.Status)</p>
+                    <h2>@reservation.ResourceName</h2>
+                    <p>@reservation.LocationName · @reservation.Capacity personen</p>
+                    <p><strong>@reservation.Start.ToLocalTime().ToString("dd-MM-yyyy HH:mm")</strong> tot @reservation.End.ToLocalTime().ToString("HH:mm")</p>
+                </div>
+                @if (reservation.Status == ReservationStatus.Active && reservation.Start > DateTimeOffset.UtcNow)
+                {
+                    <div class="reservation-actions">
+                        <button class="btn btn-primary" @onclick="() => BeginEdit(reservation)">Wijzigen</button>
+                        <button class="btn btn-link" @onclick="() => CancelAsync(reservation)">Annuleren</button>
+                    </div>
+                }
+            </article>
+        }
+    </section>
+}
+
+@if (editing is not null)
+{
+    <section class="search-panel" aria-labelledby="edit-reservation-title">
+        <h2 id="edit-reservation-title">Reservering wijzigen</h2>
+        <div class="search-grid">
+            <label class="field-group">Begintijd<input class="form-control" type="datetime-local" @bind="editStart" /></label>
+            <label class="field-group">Eindtijd<input class="form-control" type="datetime-local" @bind="editEnd" /></label>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(editError))
+        {
+            <div class="alert alert-danger" role="alert">@editError</div>
+        }
+        <button class="btn btn-primary" disabled="@isSaving" @onclick="SaveEditAsync">@(isSaving ? "Opslaan..." : "Opslaan")</button>
+        <button class="btn btn-link" @onclick="CancelEdit">Annuleren</button>
+    </section>
+}
+
+@code {
+    private readonly (string Key, string Label)[] tabs = [("upcoming", "Komend"), ("past", "Afgelopen"), ("cancelled", "Geannuleerd")];
+    private List<MyReservation> reservations = [];
+    private string activeView = "upcoming";
+    private string? errorMessage;
+    private string? editError;
+    private MyReservation? editing;
+    private DateTime editStart;
+    private DateTime editEnd;
+    private bool isLoading;
+    private bool isSaving;
+
+    protected override Task OnInitializedAsync() => LoadAsync(activeView);
+
+    private async Task LoadAsync(string view)
+    {
+        activeView = view;
+        isLoading = true;
+        errorMessage = null;
+        editing = null;
+        try { reservations = (await Reservations.GetAsync(view)).ToList(); }
+        catch (HttpRequestException) { errorMessage = "Reserveringen konden niet worden geladen. Probeer het opnieuw."; }
+        finally { isLoading = false; }
+    }
+
+    private void BeginEdit(MyReservation reservation)
+    {
+        editing = reservation;
+        editStart = reservation.Start.ToLocalTime().DateTime;
+        editEnd = reservation.End.ToLocalTime().DateTime;
+        editError = null;
+    }
+
+    private void CancelEdit() => editing = null;
+
+    private async Task SaveEditAsync()
+    {
+        if (editing is null || editEnd <= editStart) { editError = "De eindtijd moet na de begintijd liggen."; return; }
+        isSaving = true;
+        editError = null;
+        try
+        {
+            await Reservations.UpdateAsync(editing.Id, new UpdateMyReservationRequest(editing.ResourceId,
+                new DateTimeOffset(DateTime.SpecifyKind(editStart, DateTimeKind.Local)),
+                new DateTimeOffset(DateTime.SpecifyKind(editEnd, DateTimeKind.Local)), editing.Version));
+            await LoadAsync(activeView);
+        }
+        catch (MyReservationException exception) when ((int)exception.StatusCode == 409)
+        { editError = "De reservering is gewijzigd of botst met een andere reservering. Laad opnieuw."; }
+        catch (MyReservationException exception) { editError = exception.Message; }
+        finally { isSaving = false; }
+    }
+
+    private async Task CancelAsync(MyReservation reservation)
+    {
+        if (!await Js.InvokeAsync<bool>("confirm", "Deze reservering annuleren?")) return;
+        try { await Reservations.CancelAsync(reservation.Id, reservation.Version); await LoadAsync(activeView); }
+        catch (MyReservationException exception) { errorMessage = exception.Message; }
+    }
+
+    private static string StatusText(ReservationStatus status) => status == ReservationStatus.Cancelled ? "Geannuleerd" : "Actief";
+}

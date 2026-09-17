@@ -11,5 +11,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://localhost:5080") });
 builder.Services.AddScoped<RoomSearchClient>();
 builder.Services.AddScoped<BookingClient>();
+builder.Services.AddScoped<MyReservationsClient>();
 
 await builder.Build().RunAsync();

@@ -10,6 +10,9 @@ public sealed class ReservationConfiguration : IEntityTypeConfiguration<Reservat
     {
         builder.HasKey(reservation => reservation.Id);
         builder.Property(reservation => reservation.OwnerSubjectId).HasMaxLength(200).IsRequired();
+        builder.Property(reservation => reservation.ResourceNameAtBooking).HasMaxLength(200).IsRequired();
+        builder.Property(reservation => reservation.LocationNameAtBooking).HasMaxLength(200).IsRequired();
+        builder.Property(reservation => reservation.CapacityAtBooking).IsRequired();
         builder.Property(reservation => reservation.Status).HasConversion<string>().HasMaxLength(50);
         builder.Property(reservation => reservation.Version).IsConcurrencyToken();
         builder.ToTable(table => table.HasCheckConstraint(

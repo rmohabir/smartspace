@@ -12,5 +12,8 @@ public sealed class Reservation
     public DateTimeOffset CreatedAtUtc { get; set; }
     public DateTimeOffset UpdatedAtUtc { get; set; }
     public DateTimeOffset? CancelledAtUtc { get; set; }
+    public string ResourceNameAtBooking { get; set; } = string.Empty;
+    public string LocationNameAtBooking { get; set; } = string.Empty;
+    public int CapacityAtBooking { get; set; }
     public Guid Version { get; set; } = Guid.NewGuid();
 }
