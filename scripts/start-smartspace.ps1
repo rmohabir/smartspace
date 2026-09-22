@@ -30,25 +30,20 @@ $env:ConnectionStrings__SmartSpace = "Server=127.0.0.1,1433;Database=SmartSpace;
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 
 Write-Host 'Starting SQL Server...' -ForegroundColor Cyan
-docker compose up -d sqlserver
+docker compose up -d --wait sqlserver
 
-Write-Host 'Waiting for SQL Server on 127.0.0.1:1433...' -ForegroundColor Cyan
+Write-Host 'Checking SQL Server on 127.0.0.1:1433...' -ForegroundColor Cyan
 $sqlReady = $false
-for ($attempt = 1; $attempt -le 30; $attempt++) {
-    if (Test-NetConnection -ComputerName 127.0.0.1 -Port 1433 -InformationLevel Quiet) {
-        $sqlReady = $true
-        break
-    }
-
-    Start-Sleep -Seconds 2
+if (Test-NetConnection -ComputerName 127.0.0.1 -Port 1433 -InformationLevel Quiet) {
+    $sqlReady = $true
 }
 
 if (-not $sqlReady) {
     throw 'SQL Server did not become available within 60 seconds.'
 }
 
-Write-Host 'Building solution...' -ForegroundColor Cyan
-dotnet build (Join-Path $root 'SmartSpace.sln') --nologo
+Get-Process -Name 'SmartSpace.Api', 'SmartSpace.UI' -ErrorAction SilentlyContinue |
+    Stop-Process -Force -ErrorAction SilentlyContinue
 
 Get-CimInstance Win32_Process -Filter "Name='dotnet.exe'" |
     Where-Object {
@@ -56,6 +51,9 @@ Get-CimInstance Win32_Process -Filter "Name='dotnet.exe'" |
         $_.CommandLine -like '*src\SmartSpace.UI\SmartSpace.UI.csproj*'
     } |
     ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+
+Write-Host 'Building solution...' -ForegroundColor Cyan
+dotnet build (Join-Path $root 'SmartSpace.sln') --nologo
 
 Write-Host 'Starting API on http://localhost:5080...' -ForegroundColor Cyan
 Start-Process dotnet `
