@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using SmartSpace.Api;
 using SmartSpace.Api.Data;
@@ -13,11 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 var developmentIdentity = builder.Configuration
 	.GetSection(DevelopmentIdentityOptions.SectionName)
 	.Get<DevelopmentIdentityOptions>() ?? new DevelopmentIdentityOptions();
-
-if (developmentIdentity.Enabled && !developmentIdentity.IsAllowedInEnvironment(builder.Environment))
-{
-	throw new InvalidOperationException("Development identity is only allowed in Development.");
-}
+var authenticationMode = (builder.Configuration
+    .GetSection(SmartSpaceAuthenticationOptions.SectionName)
+    .Get<SmartSpaceAuthenticationOptions>() ?? new SmartSpaceAuthenticationOptions())
+    .ResolveMode(developmentIdentity);
 
 builder.Services.AddProblemDetails(ProblemDetailsMapping.Configure);
 builder.Services.AddOpenApi();
@@ -28,16 +26,7 @@ builder.Services.AddCors(options => options.AddPolicy("Development", policy =>
 		.AllowAnyHeader()
 		.AllowAnyMethod()));
 
-if (developmentIdentity.Enabled)
-{
-	builder.Services
-		.AddAuthentication("Development")
-		.AddScheme<AuthenticationSchemeOptions, DevelopmentIdentityHandler>("Development", _ => { });
-}
-else
-{
-	builder.Services.AddAuthentication();
-}
+builder.Services.AddSmartSpaceAuthentication(builder.Configuration, builder.Environment, authenticationMode, developmentIdentity);
 
 builder.Services.AddAuthorization(options =>
 	options.AddPolicy(AuthorizationPolicies.Administrator, policy =>

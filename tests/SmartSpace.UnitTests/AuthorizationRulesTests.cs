@@ -19,4 +19,11 @@ public sealed class AuthorizationRulesTests
         Assert.False(AuthorizationRules.IsAdministrator("Employee"));
         Assert.False(AuthorizationRules.IsAdministrator(null));
     }
+
+    [Fact]
+    public void Treats_users_without_administrator_role_as_non_administrators()
+    {
+        Assert.False(AuthorizationRules.IsAdministrator(string.Empty));
+        Assert.False(AuthorizationRules.IsAdministrator("administrator"));
+    }
 }
