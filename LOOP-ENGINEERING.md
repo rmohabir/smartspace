@@ -165,6 +165,53 @@ Wanneer `speckit-converge` nieuwe taken toevoegt, start een nieuwe ronde bij:
 Voer daarna opnieuw de gerichte validatie en `/speckit-converge` uit. Herhaal dit
 alleen binnen het vooraf vastgelegde iteratiebudget.
 
+## Automatisch aanroepen
+
+Gebruik in VS Code de custom agent **SmartSpace Loop Orchestrator** uit
+`.github/agents/loop-orchestrator.agent.md`. Start de agent met een concreet doel,
+bijvoorbeeld:
+
+```text
+Implementeer FR-002: filter beschikbare ruimtes op locatie en minimumcapaciteit.
+Voer de volledige gecontroleerde feedbacklus uit en stop alleen met CONVERGED,
+BLOCKED of REVIEW_REQUIRED.
+```
+
+De agent voert de analyse-, implementatie-, validatie- en convergentierondes zelf
+uit binnen het vastgelegde budget. De agent rapporteert na iedere ronde het
+feedbackrecord en vraagt menselijke beoordeling zodra een stopvoorwaarde dat
+vereist.
+
+### Nieuw feature via de orchestrator
+
+Selecteer **SmartSpace Loop Orchestrator** in de VS Code agent picker en geef een
+volledige featureopdracht, bijvoorbeeld:
+
+```text
+Voeg een nieuw feature toe: medewerkers kunnen een vergaderruimte zoeken op
+gebouw naast locatie en minimumcapaciteit. Maak een nieuwe Speckit-featuremap,
+werk de specificatie en ontwerpdocumenten uit, genereer de taken en voer daarna
+de volledige gecontroleerde feedbacklus uit. Stop alleen met CONVERGED, BLOCKED
+of REVIEW_REQUIRED.
+```
+
+De orchestrator werkt dan in deze volgorde:
+
+1. Maak een nieuwe featuremap onder `specs/` met `spec.md` via de
+   `speckit-specify`-workflow.
+2. Werk onduidelijkheden af met `speckit-clarify` wanneer dat nodig is.
+3. Maak `plan.md`, `research.md`, `data-model.md`, contracten en `quickstart.md`
+   via `speckit-plan`.
+4. Maak `tasks.md` via `speckit-tasks`.
+5. Controleer de artefacten met `speckit-analyze`.
+6. Voer de implementatie uit met `speckit-implement`.
+7. Voer gerichte build- en testvalidatie uit.
+8. Voer `speckit-converge` uit en herhaal alleen binnen het ingestelde budget.
+
+De agent maakt geen nieuwe feature in de bestaande map
+`specs/001-meeting-room-reservations/`, tenzij je expliciet zegt dat het om een
+wijziging van die bestaande feature gaat.
+
 ## Relatie met de hoofdworkflow
 
 De algemene documentvolgorde staat in [SPECKIT-WORKFLOW.md](SPECKIT-WORKFLOW.md).
